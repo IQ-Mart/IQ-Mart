@@ -41,6 +41,7 @@
         #cartSidebar.open { transform: translateX(0); }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-light-modified-512.png">
 </head>
 <body class="text-gray-900 transition-colors duration-300">
 
@@ -50,7 +51,7 @@
         <header class="sticky top-0 z-40 glass border-b border-gray-100 px-4 py-3 flex items-center justify-between gap-3 md:gap-6">
             <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="goHome()">
                 <div id="headerLogoContainer" class="flex items-center justify-center overflow-hidden w-12 h-12 md:w-14 md:h-14 shrink-0 hover:scale-105 transition-transform">
-                    <img src="https://raw.githubusercontent.com/minicraft764/ER/refs/heads/main/ER1-modified.png" class="w-full h-full object-contain drop-shadow-md">
+                    <img src="https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-light-modified-512.png" class="w-full h-full object-contain drop-shadow-md">
                 </div>
                 <h1 class="font-bold text-xl md:text-2xl hidden sm:block tracking-tight" id="headerTitle">IQ Mart</h1>
             </div>
@@ -980,5 +981,65 @@ const dict = {
         }, 3000); // 3 seconds polling for very fast reaction
 
 </script>
+
+    <!-- Embedded PWA Manifest & Service Worker -->
+    <script>
+        (function() {
+            // 1. Dynamic Manifest based on System Theme
+            const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            const manifest = {
+                name: "IQ Mart",
+                short_name: "IQ Mart",
+                start_url: "https://iq-mart.github.io/IQ-Mart/",
+                display: "standalone",
+                background_color: isDark ? "#0f172a" : "#f8fafc",
+                theme_color: isDark ? "#0f172a" : "#f8fafc",
+                icons: [
+                    {
+                        src: isDark 
+                            ? "https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-dark-modified-192.png" 
+                            : "https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-light-modified-192.png",
+                        sizes: "192x192",
+                        type: "image/png"
+                    },
+                    {
+                        src: isDark 
+                            ? "https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-dark-modified-512.png" 
+                            : "https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-light-modified-512.png",
+                        sizes: "512x512",
+                        type: "image/png"
+                    }
+                ]
+            };
+            
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestUrl;
+            document.head.appendChild(link);
+
+            // 2. Embedded Service Worker
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', (e) => self.skipWaiting());
+                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(fetch(e.request).catch(() => new Response('Network Error / Offline')));
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                
+                navigator.serviceWorker.register(swUrl).then(() => {
+                    console.log('Embedded PWA Service Worker Registered!');
+                }).catch((err) => {
+                    console.error('Service Worker Registration Failed:', err);
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
