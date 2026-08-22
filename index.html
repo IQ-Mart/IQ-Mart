@@ -149,7 +149,10 @@
                 <span class="text-[10px] font-semibold mt-1" id="navFav">Saved</span>
             </div>
             <div class="flex flex-col items-center text-gray-400 hover:text-primary cursor-pointer transition-colors w-full py-1 relative" onclick="toggleCart()">
-                <i class="ph-fill ph-shopping-cart text-2xl"></i>
+                <div class="relative">
+                    <i class="ph-fill ph-shopping-cart text-2xl"></i>
+                    <span id="cartCountMobile" class="absolute -top-1 -right-2 bg-primary text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full scale-0 transition-transform shadow-sm pointer-events-none">0</span>
+                </div>
                 <span class="text-[10px] font-semibold mt-1" id="navCart">Cart</span>
             </div>
         </nav>
@@ -340,16 +343,22 @@
             <h2 class="text-xl font-bold text-gray-800" id="cv_title">Category</h2>
         </div>
         
-        <div class="px-4 pt-4 pb-2 flex items-center gap-2 md:gap-3 shrink-0">
-            <button class="w-12 h-12 shrink-0 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-100 rounded-xl flex items-center justify-center transition-colors" onclick="resetCategoryFilters()" id="btn_reset_filters">
-                <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
-            </button>
-            <button class="flex-1 bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 rounded-xl flex justify-center items-center gap-2 font-bold text-sm text-gray-700 transition-colors" onclick="openSortMenu()">
-                <i class="ph-bold ph-sort-ascending text-lg"></i> <span id="txt_sort">Sort by</span>
-            </button>
-            <button class="flex-1 bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 rounded-xl flex justify-center items-center gap-2 font-bold text-sm text-gray-700 transition-colors" onclick="openFilterMenu()">
-                <i class="ph-bold ph-faders text-lg"></i> <span id="txt_filter">Filter price</span>
-            </button>
+        <div class="px-4 pt-4 pb-2 flex flex-col gap-3 shrink-0">
+            <div class="relative w-full">
+                <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 rtl:right-3 rtl:left-auto"></i>
+                <input type="text" id="cv_search" placeholder="Search in this category..." oninput="renderCategoryViewProducts(activeCategoryId)" class="w-full bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 pl-10 rtl:pl-3 rtl:pr-10 rounded-xl font-bold text-sm text-gray-700 transition-colors outline-none focus:ring-2 focus:ring-primary/20">
+            </div>
+            <div class="flex items-center gap-2 md:gap-3 w-full">
+                <button class="w-12 h-12 shrink-0 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-100 rounded-xl flex items-center justify-center transition-colors shadow-sm" onclick="resetCategoryFilters()" id="btn_reset_filters">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
+                </button>
+                <button class="flex-1 bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 rounded-xl flex justify-center items-center gap-2 font-bold text-sm text-gray-700 transition-colors shadow-sm" onclick="openSortMenu()">
+                    <i class="ph-bold ph-sort-ascending text-lg"></i> <span id="txt_sort">Sort by</span>
+                </button>
+                <button class="flex-1 bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 rounded-xl flex justify-center items-center gap-2 font-bold text-sm text-gray-700 transition-colors shadow-sm" onclick="openFilterMenu()">
+                    <i class="ph-bold ph-faders text-lg"></i> <span id="txt_filter">Filter price</span>
+                </button>
+            </div>
         </div>
         <div class="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5 overflow-y-auto flex-1 pb-safe content-start" id="categoryViewContainer">
 
@@ -996,9 +1005,19 @@ const dict = {
         };
 
         const updateCartUI = () => {
-            document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
-            if (cart.length > 0) document.getElementById('cartCount').classList.remove('scale-0');
-            else document.getElementById('cartCount').classList.add('scale-0');
+            const ccQty = cart.reduce((s, i) => s + i.qty, 0);
+            const cc1 = document.getElementById('cartCount');
+            if (cc1) {
+                cc1.textContent = ccQty;
+                if (cart.length > 0) cc1.classList.remove('scale-0');
+                else cc1.classList.add('scale-0');
+            }
+            const cc2 = document.getElementById('cartCountMobile');
+            if (cc2) {
+                cc2.textContent = ccQty;
+                if (cart.length > 0) cc2.classList.remove('scale-0');
+                else cc2.classList.add('scale-0');
+            }
             
             const container = document.getElementById('cartItems');
             if(cart.length === 0) {
@@ -1058,6 +1077,13 @@ const dict = {
         const renderCategoryViewProducts = (categoryId) => {
             const container = document.getElementById('categoryViewContainer');
             let data = productsData.filter(p => p.category_id === categoryId);
+            
+            // Apply Search
+            const searchInput = document.getElementById('cv_search');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            if (searchTerm) {
+                data = data.filter(p => p.title.toLowerCase().includes(searchTerm) || (p.tags && p.tags.toLowerCase().includes(searchTerm)));
+            }
             
             // Apply Price Filter
             data = data.filter(p => {
@@ -1200,6 +1226,8 @@ const dict = {
             
             activeCategoryId = id;
             document.getElementById('cv_title').textContent = isArabic ? (cat.title_ar || cat.title) : cat.title;
+            const cvs = document.getElementById('cv_search');
+            if (cvs) cvs.value = ''; // Reset search on open
             renderCategoryViewProducts(id);
             
             const modal = document.getElementById('categoryViewModal');
@@ -1644,6 +1672,8 @@ const dict = {
             if(elIMin) elIMin.value = "0";
             const elIMax = document.getElementById('input_max');
             if(elIMax) elIMax.value = "5,000,000";
+            const cvs = document.getElementById('cv_search');
+            if(cvs) cvs.value = '';
             
             if(activeCategoryId) renderCategoryViewProducts(activeCategoryId);
         };
