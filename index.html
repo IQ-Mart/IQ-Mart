@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://encrypted-tbn0.gstatic.com">
     <link rel="preconnect" href="https://phgldyvshihyzimbwxci.supabase.co">
-    <link rel="preload" as="image" href="HERO_IMAGE_URL" id="heroPreload">
+    <link rel="preload" as="image" href="hero.webp" fetchpriority="high" id="heroPreload">
     <meta name="description" content="IQ Mart - E-commerce store for top quality products in Iraq">
     <title>IQ Mart</title>
     
@@ -78,7 +78,7 @@
 
             <div class="flex-1 max-w-2xl">
                 <div class="relative group">
-                    <input type="text" id="searchInput" placeholder="Search products..." class="w-full bg-gray-100 rounded-full py-2.5 px-5 ps-12 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-transparent focus:border-primary/30 focus:bg-white" oninput="handleSearch()">
+                    <input type="text" id="searchInput" aria-label="Search products" placeholder="Search products..." class="w-full bg-gray-100 rounded-full py-2.5 px-5 ps-12 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-transparent focus:border-primary/30 focus:bg-white" oninput="handleSearch()">
                     <i class="ph ph-magnifying-glass absolute start-4 top-1/2 -translate-y-1/2 text-gray-600 text-lg group-focus-within:text-primary transition-colors"></i>
                 </div>
             </div>
@@ -202,15 +202,15 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1 ms-1" id="co_lbl_name">Full Name</label>
-                    <input type="text" id="co_name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
+                    <input type="text" id="co_name" aria-label="Full Name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1 ms-1" id="co_lbl_phone">Phone Number</label>
-                    <input type="tel" id="co_phone" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
+                    <input type="tel" id="co_phone" aria-label="Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1 ms-1" id="co_lbl_city">City</label>
-                    <input type="text" id="co_city" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
+                    <input type="text" id="co_city" aria-label="City" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1 ms-1 flex justify-between items-center">
@@ -219,7 +219,24 @@
                             <i class="ph-bold ph-crosshair"></i> <span id="co_btn_locate">Locate Me</span>
                         </button>
                     </label>
-                    <input type="text" id="co_loc" placeholder="Type or click Locate Me" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
+                    <input type="text" id="co_loc" aria-label="Detailed Location" placeholder="Type or click Locate Me" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
+                </div>
+                <!-- PROMO CODE -->
+                <div class="pt-2">
+                    <label class="block text-sm font-bold text-gray-700 mb-1 ms-1">Promo Code</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="co_promo" aria-label="Promo Code" placeholder="Optional" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary uppercase">
+                        <button onclick="applyPromoCode()" class="bg-gray-900 text-white px-6 font-bold rounded-xl hover:bg-gray-800 transition-colors">Apply</button>
+                    </div>
+                    <div id="promo_msg" class="text-sm font-bold mt-2 hidden"></div>
+                </div>
+                <!-- TOTAL DISPLAY -->
+                <div class="flex justify-between items-center py-2 px-1 border-t border-gray-100 mt-2">
+                    <span class="font-bold text-gray-500">Total:</span>
+                    <div class="text-right">
+                        <div id="co_total_old" class="text-sm line-through text-gray-400 hidden"></div>
+                        <div id="co_total_new" class="text-xl font-black text-gray-900"></div>
+                    </div>
                 </div>
                 <button onclick="submitOrder()" class="w-full bg-primary hover:bg-primaryHover text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/30 active:scale-95 text-lg mt-4" id="co_btn_submit">
                     Place Order
@@ -233,7 +250,7 @@
         <!-- flex-col on mobile, flex-row on desktop (RTL auto handles reversal beautifully!) -->
         <div class="bg-white w-full h-full max-w-full max-h-screen overflow-y-auto md:overflow-hidden transform transition-transform duration-300 flex flex-col md:flex-row relative" id="productModalContent">
             
-            <button onclick="closeProductModal()" class="absolute top-4 right-4 rtl:left-4 rtl:right-auto z-20 p-2 bg-white/90 hover:bg-white backdrop-blur rounded-full shadow-md text-gray-800 transition-colors">
+            <button onclick="closeProductModal()" aria-label="Close Product" class="absolute top-4 right-4 rtl:left-4 rtl:right-auto z-20 p-2 bg-white/90 hover:bg-white backdrop-blur rounded-full shadow-md text-gray-800 transition-colors">
                 <i class="ph-bold ph-x text-lg"></i>
             </button>
             
@@ -241,8 +258,8 @@
             <div class="w-full md:w-1/2 flex flex-col order-2 md:order-1 h-auto md:h-screen max-h-none md:overflow-y-auto">
                 <div class="p-6 md:p-10 flex-1 flex flex-col justify-center">
                     <span class="text-[11px] font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded mb-3 inline-block w-fit select-all" id="pm_id"></span>
-                    <p class="text-primary font-black text-3xl md:text-4xl mb-3" id="pm_price"></p>
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight" id="pm_title"></h2>
+                    <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-2 leading-tight" id="pm_title"></h2>
+                    <p class="text-primary font-bold text-2xl md:text-3xl mb-6" id="pm_price"></p>
                     <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 mb-6 flex-1">
                         <h4 class="font-bold text-sm text-gray-600 mb-3 uppercase tracking-wider" id="pm_desc_title">Description</h4>
                         <p class="text-gray-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap" id="pm_desc"></p>
@@ -258,6 +275,10 @@
                             <i class="ph-bold ph-shopping-cart-simple"></i> <span id="pm_add_text">Add to Cart</span>
                         </button>
                     </div>
+                    
+                    <!-- Related Products (AOV) -->
+                    <div id="pm_related_products" class="w-full mt-8 hidden border-t border-gray-100 pt-6"></div>
+                    
                 </div>
             </div>
 
@@ -296,7 +317,7 @@
                     <i class="ph-fill ph-receipt text-primary"></i> 
                     <span id="mo_title">My Orders</span>
                 </h2>
-                <button onclick="closeMyOrders()" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-full transition-colors shadow-sm">
+                <button onclick="closeMyOrders()" aria-label="Close Orders" class="p-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-full transition-colors shadow-sm">
                     <i class="ph-bold ph-x"></i>
                 </button>
             </div>
@@ -304,13 +325,13 @@
         </div>
     </div>
 
-    <!-- MOBILE CATEGORIES OVERLAY -->
-    <div id="mobileCatModal" class="fixed inset-0 bg-white z-[80] hidden opacity-0 transition-opacity duration-300 flex-col pb-20 overflow-y-auto md:hidden">
-        <div class="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 p-4 flex justify-between items-center z-10">
-            <h2 class="text-xl font-bold text-gray-800" id="mc_title">All Categories</h2>
-            <button onclick="closeMobileCategories()" class="p-2 bg-gray-100 rounded-full" aria-label="Close"><i class="ph-bold ph-x"></i></button>
+    <!-- ALL CATEGORIES OVERLAY -->
+    <div id="mobileCatModal" class="fixed inset-0 bg-white z-[80] hidden opacity-0 transition-opacity duration-300 flex-col pb-20 md:pb-0 overflow-y-auto">
+        <div class="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 p-4 md:p-6 flex justify-between items-center z-10 shadow-sm">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800" id="mc_title">All Categories</h2>
+            <button onclick="closeMobileCategories()" class="p-2 md:p-3 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full" aria-label="Close"><i class="ph-bold ph-x md:text-xl"></i></button>
         </div>
-        <div class="p-4 grid grid-cols-3 gap-4" id="mobileCatContainer"></div>
+        <div class="p-4 md:p-8 grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4 md:gap-6" id="mobileCatContainer"></div>
     </div>
 
     
@@ -333,7 +354,7 @@
             </div>
             <div class="relative flex-1">
                 <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 rtl:right-3 rtl:left-auto"></i>
-                <input type="text" id="dv_search" placeholder="Search offers..." oninput="renderDiscountView()" class="w-full bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 pl-10 rtl:pl-3 rtl:pr-10 rounded-xl font-bold text-sm text-gray-700 transition-colors outline-none">
+                <input type="text" id="dv_search" aria-label="Search discounts" placeholder="Search offers..." oninput="renderDiscountView()" class="w-full bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 pl-10 rtl:pl-3 rtl:pr-10 rounded-xl font-bold text-sm text-gray-700 transition-colors outline-none">
             </div>
         </div>
 
@@ -351,7 +372,7 @@
         <div class="px-4 pt-4 pb-2 flex flex-col gap-3 shrink-0">
             <div class="relative w-full">
                 <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 rtl:right-3 rtl:left-auto"></i>
-                <input type="text" id="cv_search" placeholder="Search in this category..." oninput="renderCategoryViewProducts(activeCategoryId)" class="w-full bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 pl-10 rtl:pl-3 rtl:pr-10 rounded-xl font-bold text-sm text-gray-700 transition-colors outline-none focus:ring-2 focus:ring-primary/20">
+                <input type="text" id="cv_search" aria-label="Search category" placeholder="Search in this category..." oninput="renderCategoryViewProducts(activeCategoryId)" class="w-full bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 pl-10 rtl:pl-3 rtl:pr-10 rounded-xl font-bold text-sm text-gray-700 transition-colors outline-none focus:ring-2 focus:ring-primary/20">
             </div>
             <div class="flex items-center gap-2 md:gap-3 w-full">
                 <button class="w-12 h-12 shrink-0 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-500 border border-gray-200 hover:border-red-100 rounded-xl flex items-center justify-center transition-colors shadow-sm" onclick="resetCategoryFilters()" id="btn_reset_filters" aria-label="Reset Filters">
@@ -397,19 +418,19 @@
             </div>
             
             <div class="dual-slider mt-10">
-                <input type="range" min="0" max="5000000" step="5000" value="0" id="filter_min" oninput="updateFilterUI('min')">
-                <input type="range" min="0" max="5000000" step="5000" value="5000000" id="filter_max" oninput="updateFilterUI('max')">
+                <input type="range" min="0" max="5000000" step="5000" value="0" id="filter_min" aria-label="Minimum price slider" oninput="updateFilterUI('min')">
+                <input type="range" min="0" max="5000000" step="5000" value="5000000" id="filter_max" aria-label="Maximum price slider" oninput="updateFilterUI('max')">
             </div>
 
             <div class="flex items-center justify-between gap-4 mt-8">
                 <div class="flex-1 relative">
                     <label class="text-xs text-gray-600 font-bold mb-2 block uppercase tracking-wider" id="txt_min_price">Min Price</label>
-                    <input type="tel" id="input_min" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 font-bold text-gray-900 focus:outline-none focus:border-primary" value="0" oninput="updateFilterFromInput()" onchange="updateFilterFromInput()">
+                    <input type="tel" id="input_min" aria-label="Minimum price input" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 font-bold text-gray-900 focus:outline-none focus:border-primary" value="0" oninput="updateFilterFromInput()" onchange="updateFilterFromInput()">
                 </div>
                 <div class="w-4 h-px bg-gray-300 mt-6"></div>
                 <div class="flex-1 relative">
                     <label class="text-xs text-gray-600 font-bold mb-2 block uppercase tracking-wider" id="txt_max_price">Max Price</label>
-                    <input type="tel" id="input_max" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 font-bold text-gray-900 focus:outline-none focus:border-primary" value="5,000,000" oninput="updateFilterFromInput()" onchange="updateFilterFromInput()">
+                    <input type="tel" id="input_max" aria-label="Maximum price input" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 font-bold text-gray-900 focus:outline-none focus:border-primary" value="5,000,000" oninput="updateFilterFromInput()" onchange="updateFilterFromInput()">
                 </div>
             </div>
             
@@ -517,7 +538,7 @@
                             <h4 class="font-bold text-sm text-gray-800 truncate">${p.title}</h4>
                             <div class="text-primary font-black text-sm">${formatIQD(p.price)}</div>
                         </div>
-                        <button onclick="toggleFavorite('${p.id}', event)" class="p-2 text-red-500 hover:bg-red-50 rounded-full shrink-0 transition-colors">
+                        <button onclick="toggleFavorite('${p.id}', event)" class="p-2 text-red-500 hover:bg-red-50 rounded-full shrink-0 transition-colors" aria-label="Toggle Favorite">
                             <i class="ph-fill ph-heart text-xl"></i>
                         </button>
                     </div>
@@ -665,7 +686,7 @@ const dict = {
             heroCurrentIndex = 0;
             
             let imagesHtml = bannersData.map((b, i) => `
-                <img src="${b.image_url}" alt="Promo Banner" width="800" height="400" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}" id="banner-${i}">
+                <img src="${i === 0 ? 'hero.webp' : b.image_url}" alt="Promo Banner" width="800" height="400" fetchpriority="high" loading="eager" decoding="async" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}" id="banner-${i}">
             `).join('');
             
             let buttonsHtml = bannersData.length > 1 ? `
@@ -768,17 +789,32 @@ const dict = {
                     </div>
                     <span class="text-xs md:text-sm font-bold ${currentFilter === c.id ? 'text-primary' : 'text-gray-600'}">${isArabic ? c.name_ar : c.name_en}</span>
                 </div>
-            `).join('');
+            `).join('') + `
+                <div class="hidden md:flex flex-col items-center gap-2 cursor-pointer snap-start shrink-0 group" onclick="openMobileCategories()">
+                    <div class="w-20 h-20 rounded-2xl bg-gray-50 hover:bg-gray-100 shadow-sm flex items-center justify-center border-2 border-transparent transition-all group-active:scale-95">
+                        <i class="ph-bold ph-dots-three text-3xl text-gray-600 group-hover:text-primary"></i>
+                    </div>
+                    <span class="text-sm font-bold text-gray-600 group-hover:text-primary">${isArabic ? 'المزيد' : 'More'}</span>
+                </div>
+            `;
 
             // Also for mobile Cat Modal
             const mcContainer = document.getElementById('mobileCatContainer');
             if(mcContainer) {
-                mcContainer.innerHTML = categoriesData.map(c => `
-                    <div class="flex flex-col items-center gap-2 cursor-pointer" onclick=\"openCategoryView('${c.id}'); closeMobileCategories();\">
-                        <div class="w-full aspect-square rounded-2xl bg-gray-50 flex items-center justify-center p-4">
-                            <img src="${c.icon_url}" alt="${c.name_en || c.title || 'Category'}" loading="lazy" width="100" height="100" class="w-full h-full object-contain" decoding="async">
+                const allCatBtn = `
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="closeMobileCategories(); openCategoryView('all');">
+                        <div class="w-full aspect-square rounded-2xl bg-primary/5 group-hover:bg-primary/10 transition-colors flex items-center justify-center p-4 border border-primary/20">
+                            <i class="ph-fill ph-squares-four text-3xl md:text-4xl text-primary"></i>
                         </div>
-                        <span class="text-xs font-bold text-center">${isArabic ? c.name_ar : c.name_en}</span>
+                        <span class="text-xs md:text-sm font-bold text-center text-primary">${isArabic ? 'الكل' : 'All'}</span>
+                    </div>
+                `;
+                mcContainer.innerHTML = allCatBtn + categoriesData.map(c => `
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="openCategoryView('${c.id}'); closeMobileCategories();">
+                        <div class="w-full aspect-square rounded-2xl bg-gray-50 group-hover:bg-gray-100 transition-colors flex items-center justify-center p-4">
+                            <img src="${c.icon_url}" alt="${c.name_en || c.title || 'Category'}" loading="lazy" width="100" height="100" class="w-full h-full object-contain group-hover:scale-110 transition-transform" decoding="async">
+                        </div>
+                        <span class="text-xs md:text-sm font-bold text-center text-gray-700">${isArabic ? c.name_ar : c.name_en}</span>
                     </div>
                 `).join('');
             }
@@ -817,10 +853,10 @@ const dict = {
                         ${p.discount_pct ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm z-20">-${p.discount_pct}%</div>` : ''}
                         <img src="${img}" alt="${p.title}" loading="lazy" width="400" height="400" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500" decoding="async">
                         <div class="absolute bottom-2 right-2 md:bottom-3 md:right-3 flex items-center gap-2 z-10">
-                            <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); renderProducts();">
+                            <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); renderProducts();" aria-label="Toggle Favorite">
                                 <i class="ph-fill ph-heart md:text-lg"></i>
                             </button>
-                            <button class="bg-white hover:bg-primary text-gray-900 hover:text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); addToCart('${p.id}')">
+                            <button class="bg-white hover:bg-primary text-gray-900 hover:text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); addToCart('${p.id}')" aria-label="Add to Cart">
                                 <i class="ph-bold ph-plus md:text-lg"></i>
                             </button>
                         </div>
@@ -834,19 +870,12 @@ const dict = {
                 </div>
             `}).join('');
             
-            if (currentFilter) {
+            if (!searchTerm) {
+                const targetCat = currentFilter ? currentFilter : 'all';
                 htmlContent += `
                     <div class="col-span-full flex justify-center mt-6 mb-2">
-                        <button class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 font-bold py-3 px-8 rounded-xl transition-colors shadow-sm flex items-center gap-2" onclick="openCategoryView('${currentFilter}')">
-                            <span class="txt_show_more_cat">${isArabic ? 'عرض المزيد' : 'Show more'}</span> <i class="ph-bold ph-arrow-right rtl:rotate-180"></i>
-                        </button>
-                    </div>
-                `;
-            } else if (totalCount > window.homeLimit && !searchTerm) {
-                htmlContent += `
-                    <div class="col-span-full flex justify-center mt-6 mb-2">
-                        <button class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 font-bold py-3 px-8 rounded-xl transition-colors shadow-sm flex items-center gap-2" onclick="window.homeLimit += 20; renderProducts();">
-                            <span class="txt_show_more_all">${isArabic ? 'عرض المزيد' : 'Load more'}</span> <i class="ph-bold ph-caret-down"></i>
+                        <button class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 font-bold py-3 px-8 rounded-xl transition-colors shadow-sm flex items-center gap-2" onclick="openCategoryView('${targetCat}')">
+                            <span class="txt_show_more_all">${isArabic ? 'عرض المزيد' : 'Show more'}</span> <i class="ph-bold ph-arrow-right rtl:rotate-180"></i>
                         </button>
                     </div>
                 `;
@@ -884,7 +913,7 @@ const dict = {
             
             if(images.length > 1) {
                 document.getElementById('pm_dots').innerHTML = images.map((_, i) => `
-                    <button class="${i === 0 ? 'w-2.5 h-2.5 rounded-full bg-primary transition-all duration-300 transform scale-110' : 'w-2 h-2 rounded-full bg-gray-300 transition-all duration-300'}" onclick="document.getElementById('pm_slider').scroll({left: ${i} * document.getElementById('pm_slider').clientWidth, behavior: 'smooth'})"></button>
+                    <button class="${i === 0 ? 'w-2.5 h-2.5 rounded-full bg-primary transition-all duration-300 transform scale-110' : 'w-2 h-2 rounded-full bg-gray-300 transition-all duration-300'}" onclick="document.getElementById('pm_slider').scroll({left: ${i} * document.getElementById('pm_slider').clientWidth, behavior: 'smooth'})" aria-label="Go to slide ${i + 1}"></button>
                 `).join('');
                 document.getElementById('pm_prev').classList.remove('hidden');
                 document.getElementById('pm_next').classList.remove('hidden');
@@ -898,6 +927,39 @@ const dict = {
             
             document.getElementById('pm_add_btn').onclick = () => addToCart(prod.id);
             
+
+            // AOV Related Products
+            const aovContainer = document.getElementById('pm_related_products');
+            aovContainer.innerHTML = '';
+            aovContainer.classList.add('hidden');
+            if (prod.tags) {
+                const pTags = Array.isArray(prod.tags) ? prod.tags : (typeof prod.tags === 'string' ? prod.tags.toLowerCase().split(',').map(s=>s.trim()) : []);
+                if (pTags.length > 0) {
+                    const related = productsData.filter(x => {
+                        if (x.id === prod.id || !x.tags) return false;
+                        const xTags = Array.isArray(x.tags) ? x.tags : (typeof x.tags === 'string' ? x.tags.toLowerCase().split(',').map(s=>s.trim()) : []);
+                        return xTags.some(t => pTags.includes(t));
+                    }).slice(0, 4);
+                    if (related.length > 0) {
+                    aovContainer.classList.remove('hidden');
+                    aovContainer.innerHTML = `
+                        <h3 class="text-lg font-bold mb-4">You might also like</h3>
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                            ${related.map(r => `
+                                <div onclick="openProductModal('${r.id}')" class="cursor-pointer group flex flex-col items-center text-center p-3 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+                                    <div class="aspect-square bg-gray-50 w-full rounded-xl overflow-hidden mb-3">
+                                        <img src="${(r.images && r.images.length > 0) ? r.images[0] : r.image_url}" class="w-full h-full object-contain group-hover:scale-105 transition-transform" loading="lazy">
+                                    </div>
+                                    <div class="font-bold text-sm text-gray-800 line-clamp-1 mb-1">${r.title}</div>
+                                    <div class="text-primary text-sm font-black">${formatIQD(r.price)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                }
+            }
+
             const favIcon = document.getElementById('pm_fav_icon');
             if(favorites.includes(prod.id)) {
                 favIcon.classList.add('text-red-500');
@@ -1010,6 +1072,20 @@ const dict = {
         };
 
         const updateCartUI = () => {
+            // Sync cart prices with latest productsData to prevent price mismatches
+            if (productsData && productsData.length > 0) {
+                let changed = false;
+                cart.forEach(cItem => {
+                    const freshItem = productsData.find(p => p.id === cItem.id);
+                    if (freshItem && freshItem.price !== cItem.price) {
+                        cItem.price = freshItem.price;
+                        cItem.title = freshItem.title; // keep title synced too
+                        changed = true;
+                    }
+                });
+                if (changed) idb.set('cart', cart);
+            }
+
             const ccQty = cart.reduce((s, i) => s + i.qty, 0);
             const cc1 = document.getElementById('cartCount');
             if (cc1) {
@@ -1051,16 +1127,76 @@ const dict = {
                 `}).join('');
             }
             
-            const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            if (window.activePromo) {
+                total = total - ((total * window.activePromo.discount_percent) / 100);
+            }
             document.getElementById('cartTotalAmount').textContent = formatIQD(total);
         };
 
         const openCheckoutModal = () => {
             if(cart.length === 0) return;
             toggleCart();
+            
+            // Reset Promo
+            window.activePromo = null;
+            document.getElementById('co_promo').value = '';
+            const msg = document.getElementById('promo_msg');
+            msg.classList.add('hidden');
+            msg.className = 'text-sm font-bold mt-2 hidden';
+            msg.innerText = '';
+            
+            // Calculate base total
+            const baseTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            document.getElementById('co_total_old').classList.add('hidden');
+            document.getElementById('co_total_new').innerHTML = formatIQD(baseTotal);
+            
             const modal = document.getElementById('checkoutModal');
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        };
+        
+        window.activePromo = null;
+        const applyPromoCode = async () => {
+            const codeInput = document.getElementById('co_promo').value.trim().toUpperCase();
+            const msg = document.getElementById('promo_msg');
+            
+            if(!codeInput) return;
+            
+            msg.classList.remove('hidden');
+            msg.className = 'text-sm font-bold mt-2 text-gray-500';
+            msg.innerText = 'Checking...';
+            
+            try {
+                const { data, error } = await supaClient.from('promos').select('*').eq('code', codeInput).eq('is_active', true).maybeSingle();
+                
+                if (error || !data) {
+                    msg.className = 'text-sm font-bold mt-2 text-red-500';
+                    msg.innerText = 'Invalid or expired promo code.';
+                    window.activePromo = null;
+                } else {
+                    msg.className = 'text-sm font-bold mt-2 text-green-600 bg-green-50 p-2 rounded';
+                    msg.innerText = `Success! ${data.discount_percent}% off applied.`;
+                    window.activePromo = data;
+                }
+                
+                // Recalculate Total
+                const baseTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                if (window.activePromo) {
+                    const discount = (baseTotal * window.activePromo.discount_percent) / 100;
+                    const finalTotal = baseTotal - discount;
+                    document.getElementById('co_total_old').classList.remove('hidden');
+                    document.getElementById('co_total_old').innerHTML = formatIQD(baseTotal);
+                    document.getElementById('co_total_new').innerHTML = formatIQD(finalTotal);
+                } else {
+                    document.getElementById('co_total_old').classList.add('hidden');
+                    document.getElementById('co_total_new').innerHTML = formatIQD(baseTotal);
+                }
+            } catch (err) {
+                console.error(err);
+                msg.className = 'text-sm font-bold mt-2 text-red-500';
+                msg.innerText = 'Error checking code.';
+            }
         };
 
         const closeCheckoutModal = () => {
@@ -1081,13 +1217,24 @@ const dict = {
         
         const renderCategoryViewProducts = (categoryId) => {
             const container = document.getElementById('categoryViewContainer');
-            let data = productsData.filter(p => p.category_id === categoryId);
+            let data = categoryId === 'all' ? [...productsData] : productsData.filter(p => p.category_id === categoryId);
             
             // Apply Search
             const searchInput = document.getElementById('cv_search');
             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             if (searchTerm) {
-                data = data.filter(p => p.title.toLowerCase().includes(searchTerm) || (p.tags && p.tags.toLowerCase().includes(searchTerm)));
+                data = data.filter(p => {
+                    const titleMatch = p.title.toLowerCase().includes(searchTerm);
+                    let tagsMatch = false;
+                    if (p.tags) {
+                        if (Array.isArray(p.tags)) {
+                            tagsMatch = p.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(searchTerm));
+                        } else if (typeof p.tags === 'string') {
+                            tagsMatch = p.tags.toLowerCase().includes(searchTerm);
+                        }
+                    }
+                    return titleMatch || tagsMatch;
+                });
             }
             
             // Apply Price Filter
@@ -1113,10 +1260,10 @@ const dict = {
                         ${p.discount_pct ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm z-20">-${p.discount_pct}%</div>` : ''}
                         <img src="${img}" alt="${p.title}" loading="lazy" width="400" height="400" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500" decoding="async">
                         <div class="absolute bottom-2 right-2 md:bottom-3 md:right-3 flex items-center gap-2 z-10">
-                            <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); renderCategoryViewProducts('${categoryId}'); renderProducts();">
+                            <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); renderCategoryViewProducts('${categoryId}'); renderProducts();" aria-label="Toggle Favorite">
                                 <i class="ph-fill ph-heart md:text-lg"></i>
                             </button>
-                            <button class="bg-white hover:bg-primary text-gray-900 hover:text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); addToCart('${p.id}')">
+                            <button class="bg-white hover:bg-primary text-gray-900 hover:text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); addToCart('${p.id}')" aria-label="Add to Cart">
                                 <i class="ph-bold ph-plus md:text-lg"></i>
                             </button>
                         </div>
@@ -1190,7 +1337,18 @@ const dict = {
                 filtered = filtered.filter(p => p.category_id === catFilter);
             }
             if (searchTerm) {
-                filtered = filtered.filter(p => p.title.toLowerCase().includes(searchTerm) || (p.tags && p.tags.toLowerCase().includes(searchTerm)));
+                filtered = filtered.filter(p => {
+                    const titleMatch = p.title.toLowerCase().includes(searchTerm);
+                    let tagsMatch = false;
+                    if (p.tags) {
+                        if (Array.isArray(p.tags)) {
+                            tagsMatch = p.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(searchTerm));
+                        } else if (typeof p.tags === 'string') {
+                            tagsMatch = p.tags.toLowerCase().includes(searchTerm);
+                        }
+                    }
+                    return titleMatch || tagsMatch;
+                });
             }
             
             if (filtered.length === 0) {
@@ -1206,10 +1364,10 @@ const dict = {
                         ${p.discount_pct ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm z-20">-${p.discount_pct}%</div>` : ''}
                         <img src="${img}" alt="${p.title}" loading="lazy" width="400" height="400" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500" decoding="async">
                         <div class="absolute bottom-2 right-2 md:bottom-3 md:right-3 flex items-center gap-2 z-10">
-                            <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); window.renderDiscountView();">
+                            <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); window.renderDiscountView();" aria-label="Toggle Favorite">
                                 <i class="ph-fill ph-heart md:text-lg"></i>
                             </button>
-                            <button class="bg-white hover:bg-primary text-gray-900 hover:text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); addToCart('${p.id}')">
+                            <button class="bg-white hover:bg-primary text-gray-900 hover:text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); addToCart('${p.id}')" aria-label="Add to Cart">
                                 <i class="ph-bold ph-plus md:text-lg"></i>
                             </button>
                         </div>
@@ -1226,7 +1384,7 @@ const dict = {
         };
 
         const openCategoryView = (id, skipHistory = false) => {
-            const cat = categoriesData.find(c => c.id === id);
+            const cat = id === 'all' ? { id: 'all', title: 'All Products', title_ar: 'كل المنتجات' } : categoriesData.find(c => c.id === id);
             if(!cat) return;
             
             activeCategoryId = id;
@@ -1445,9 +1603,12 @@ const dict = {
             btn.disabled = true;
             btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-xl"></i>';
             
-            const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            let total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            if (window.activePromo) {
+                total = total - ((total * window.activePromo.discount_percent) / 100);
+            }
             
-            const customer = { name, phone, city, loc };
+            const customer = { name, phone, city, loc, promo: window.activePromo };
             const items = cart.map(c => ({ id: c.id, title: c.title, price: c.price, qty: c.qty }));
             
             const { data, error } = await supaClient.from('orders').insert([{ customer, items, total_amount: total }]).select();
@@ -1913,7 +2074,7 @@ const dict = {
 
     <!-- Lightbox Modal -->
     <div id="imageLightbox" class="fixed inset-0 bg-black/95 z-[100] hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeLightbox()">
-        <button class="absolute top-6 right-6 z-10 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full backdrop-blur transition-colors">
+        <button aria-label="Close Lightbox" class="absolute top-6 right-6 z-10 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full backdrop-blur transition-colors">
             <i class="ph-bold ph-x text-2xl"></i>
         </button>
         <img id="lightboxImg" src="" alt="Full screen product image" loading="lazy" width="800" height="800" class="max-w-[95%] max-h-[95%] object-contain drop-shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()" decoding="async">
@@ -1923,7 +2084,7 @@ const dict = {
     <!-- Cancel Contact Modal -->
     <div id="cancelContactModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300 px-4" onclick="closeCancelContact()">
         <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300 p-6 flex flex-col gap-4 text-center relative" onclick="event.stopPropagation()">
-            <button onclick="closeCancelContact()" class="absolute top-4 right-4 rtl:left-4 rtl:right-auto text-gray-600 hover:text-gray-800 transition-colors">
+            <button onclick="closeCancelContact()" aria-label="Close Contact" class="absolute top-4 right-4 rtl:left-4 rtl:right-auto text-gray-600 hover:text-gray-800 transition-colors">
                 <i class="ph-bold ph-x text-xl"></i>
             </button>
             <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-2">
