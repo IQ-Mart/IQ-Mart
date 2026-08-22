@@ -2,7 +2,8 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IQ Mart - E-commerce store for top quality products in Iraq">
     <title>IQ Mart</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,6 +26,8 @@
         }
     </script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
@@ -66,7 +69,7 @@
         <header class="sticky top-0 z-40 glass border-b border-gray-100 px-4 py-3 flex items-center justify-between gap-3 md:gap-6">
             <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="goHome()">
                 <div id="headerLogoContainer" class="flex items-center justify-center overflow-hidden w-12 h-12 md:w-14 md:h-14 shrink-0 hover:scale-105 transition-transform">
-                    <img src="https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-light-modified-512.png" class="w-full h-full object-contain drop-shadow-md">
+                    <img src="https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-light-modified-512.png" alt="IQ Mart Logo" width="512" height="512" class="w-full h-full object-contain drop-shadow-md">
                 </div>
                 <h1 class="font-bold text-xl md:text-2xl hidden sm:block tracking-tight" id="headerTitle">IQ Mart</h1>
             </div>
@@ -79,7 +82,7 @@
             </div>
 
             <div class="flex items-center gap-2 md:gap-4 shrink-0">
-                <div class="relative cursor-pointer hover:bg-gray-100 p-2 rounded-xl transition-colors" onclick="openSettings()">
+                <div class="relative cursor-pointer hover:bg-gray-100 p-2 rounded-xl transition-colors" onclick="openSettings()" aria-label="Settings" role="button" tabindex="0">
                     <i class="ph ph-gear text-2xl text-gray-700"></i>
                 </div>
                 <button onclick="openDiscountView()" class="hidden md:flex items-center gap-1 font-bold text-sm bg-red-50 text-red-600 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors border border-red-200 shadow-sm" id="navDesktopDiscount">
@@ -192,7 +195,7 @@
         <div class="bg-white rounded-3xl w-full max-w-md p-6 md:p-8 transform scale-95 transition-transform duration-300 " id="checkoutModalContent">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-gray-900" id="co_title">Checkout Details</h2>
-                <button onclick="closeCheckoutModal()" class="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"><i class="ph-bold ph-x"></i></button>
+                <button onclick="closeCheckoutModal()" class="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors" aria-label="Close"><i class="ph-bold ph-x"></i></button>
             </div>
             <div class="space-y-4">
                 <div>
@@ -243,10 +246,10 @@
                         <p class="text-gray-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap" id="pm_desc"></p>
                     </div>
                     <div class="flex gap-2 md:gap-3">
-                        <button id="pm_share_btn" class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-2xl flex items-center justify-center transition-colors border border-gray-200" title="Share">
+                        <button id="pm_share_btn" class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-2xl flex items-center justify-center transition-colors border border-gray-200" title="Share" aria-label="Share">
                             <i class="ph-bold ph-share-network text-2xl"></i>
                         </button>
-                        <button id="pm_fav_btn" class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-gray-50 hover:bg-gray-100 text-gray-300 rounded-2xl flex items-center justify-center transition-colors border border-gray-200" title="Favorite">
+                        <button id="pm_fav_btn" class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-gray-50 hover:bg-gray-100 text-gray-300 rounded-2xl flex items-center justify-center transition-colors border border-gray-200" title="Favorite" aria-label="Toggle Favorite">
                             <i class="ph-fill ph-heart text-2xl transition-colors" id="pm_fav_icon"></i>
                         </button>
                         <button id="pm_add_btn" class="flex-1 bg-gray-900 hover:bg-primary text-white py-3 md:py-4 rounded-2xl font-bold transition-all active:scale-[0.98] shadow-xl shadow-gray-900/20 flex items-center justify-center gap-2 text-base md:text-lg">
@@ -259,8 +262,8 @@
             <!-- Right Side in LTR (Images Slider) -->
             <div class="relative w-full md:w-1/2 h-80 md:h-screen bg-[#F7F7F7] flex-shrink-0 group order-1 md:order-2 border-b md:border-b-0 md:border-s border-gray-100">
                 <div class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center" style="scroll-behavior: smooth;" id="pm_slider"></div>
-                <button id="pm_prev" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hidden z-10" onclick="scrollPmSlider(-1)"><i class="ph-bold ph-caret-left"></i></button>
-                <button id="pm_next" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hidden z-10" onclick="scrollPmSlider(1)"><i class="ph-bold ph-caret-right"></i></button>
+                <button id="pm_prev" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hidden z-10" onclick="scrollPmSlider(-1)" aria-label="Previous Image"><i class="ph-bold ph-caret-left"></i></button>
+                <button id="pm_next" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hidden z-10" onclick="scrollPmSlider(1)" aria-label="Next Image"><i class="ph-bold ph-caret-right"></i></button>
                 <div class="absolute bottom-6 left-0 w-full flex justify-center gap-2 z-10" id="pm_dots"></div>
             </div>
             
@@ -275,7 +278,7 @@
             <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-4 md:hidden"></div>
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-3xl sticky top-0 z-10">
                 <h2 class="font-bold text-xl text-gray-800 flex items-center gap-2" id="fav_title"><i class="ph-fill ph-heart text-red-500"></i> Saved</h2>
-                <button onclick="closeFavoritesModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"><i class="ph-bold ph-x"></i></button>
+                <button onclick="closeFavoritesModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors" aria-label="Close"><i class="ph-bold ph-x"></i></button>
             </div>
             <div class="p-6 overflow-y-auto no-scrollbar flex-1 space-y-3" id="favoritesList">
                 <!-- Favorites injected here -->
@@ -303,7 +306,7 @@
     <div id="mobileCatModal" class="fixed inset-0 bg-white z-[80] hidden opacity-0 transition-opacity duration-300 flex-col pb-20 overflow-y-auto md:hidden">
         <div class="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 p-4 flex justify-between items-center z-10">
             <h2 class="text-xl font-bold text-gray-800" id="mc_title">All Categories</h2>
-            <button onclick="closeMobileCategories()" class="p-2 bg-gray-100 rounded-full"><i class="ph-bold ph-x"></i></button>
+            <button onclick="closeMobileCategories()" class="p-2 bg-gray-100 rounded-full" aria-label="Close"><i class="ph-bold ph-x"></i></button>
         </div>
         <div class="p-4 grid grid-cols-3 gap-4" id="mobileCatContainer"></div>
     </div>
@@ -314,7 +317,7 @@
     <!-- Discount View Modal -->
     <div id="discountViewModal" class="fixed inset-0 bg-white z-[90] hidden opacity-0 transition-opacity duration-300 flex-col overflow-hidden">
         <div class="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 p-4 flex items-center z-10 gap-3 shadow-sm">
-            <button onclick="closeDiscountView()" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"><i class="ph-bold ph-arrow-left rtl:rotate-180"></i></button>
+            <button onclick="closeDiscountView()" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors" aria-label="Back"><i class="ph-bold ph-arrow-left rtl:rotate-180"></i></button>
             <h2 class="text-xl font-bold text-gray-800" id="dv_title">Special Offers</h2>
         </div>
         
@@ -339,7 +342,7 @@
 
     <div id="categoryViewModal" class="fixed inset-0 bg-white z-[90] hidden opacity-0 transition-opacity duration-300 flex-col overflow-hidden">
         <div class="sticky top-0 bg-white/90 backdrop-blur border-b border-gray-100 p-4 flex items-center z-10 gap-3 shadow-sm">
-            <button onclick="closeCategoryView()" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"><i class="ph-bold ph-arrow-left rtl:rotate-180"></i></button>
+            <button onclick="closeCategoryView()" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors" aria-label="Back"><i class="ph-bold ph-arrow-left rtl:rotate-180"></i></button>
             <h2 class="text-xl font-bold text-gray-800" id="cv_title">Category</h2>
         </div>
         
@@ -349,7 +352,7 @@
                 <input type="text" id="cv_search" placeholder="Search in this category..." oninput="renderCategoryViewProducts(activeCategoryId)" class="w-full bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 pl-10 rtl:pl-3 rtl:pr-10 rounded-xl font-bold text-sm text-gray-700 transition-colors outline-none focus:ring-2 focus:ring-primary/20">
             </div>
             <div class="flex items-center gap-2 md:gap-3 w-full">
-                <button class="w-12 h-12 shrink-0 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-100 rounded-xl flex items-center justify-center transition-colors shadow-sm" onclick="resetCategoryFilters()" id="btn_reset_filters">
+                <button class="w-12 h-12 shrink-0 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-100 rounded-xl flex items-center justify-center transition-colors shadow-sm" onclick="resetCategoryFilters()" id="btn_reset_filters" aria-label="Reset Filters">
                     <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
                 </button>
                 <button class="flex-1 bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 rounded-xl flex justify-center items-center gap-2 font-bold text-sm text-gray-700 transition-colors shadow-sm" onclick="openSortMenu()">
@@ -373,7 +376,7 @@
         <div class="bg-white w-full sm:w-96 rounded-t-3xl sm:rounded-3xl p-6 relative z-10 shadow-2xl transform transition-transform">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-bold text-xl text-gray-800" id="txt_sort_title">Sort by</h3>
-                <button onclick="closeSortMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100"><i class="ph-bold ph-x"></i></button>
+                <button onclick="closeSortMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100" aria-label="Close"><i class="ph-bold ph-x"></i></button>
             </div>
             <div class="flex flex-col gap-3">
                 <button class="p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl text-start font-bold border border-gray-100 transition-colors flex items-center gap-3" onclick="applyCategorySort('asc')"><i class="ph-bold ph-trend-up text-primary text-xl"></i> <span id="txt_sort_asc">Cheap to expensive</span></button>
@@ -388,7 +391,7 @@
         <div class="bg-white w-full sm:w-[450px] rounded-t-3xl sm:rounded-3xl p-6 relative z-10 shadow-2xl">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="font-bold text-xl text-gray-800" id="txt_filter_title">Filter price</h3>
-                <button onclick="closeFilterMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100"><i class="ph-bold ph-x"></i></button>
+                <button onclick="closeFilterMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100" aria-label="Close"><i class="ph-bold ph-x"></i></button>
             </div>
             
             <div class="dual-slider mt-10">
@@ -507,7 +510,7 @@
                     const img = (p.images && p.images.length > 0) ? p.images[0] : p.image_url;
                     return `
                     <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-3 border border-gray-100 cursor-pointer hover:shadow-md transition-shadow relative" onclick="openProductModal('${p.id}')">
-                        <img src="${img}" class="w-16 h-16 object-contain bg-white rounded-lg p-1 shrink-0 shadow-sm">
+                        <img src="${img}" alt="${p.title}" loading="lazy" width="64" height="64" class="w-16 h-16 object-contain bg-white rounded-lg p-1 shrink-0 shadow-sm">
                         <div class="flex-1 min-w-0">
                             <h4 class="font-bold text-sm text-gray-800 truncate">${p.title}</h4>
                             <div class="text-primary font-black text-sm">${formatIQD(p.price)}</div>
@@ -660,14 +663,14 @@ const dict = {
             heroCurrentIndex = 0;
             
             let imagesHtml = bannersData.map((b, i) => `
-                <img src="${b.image_url}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}" id="banner-${i}">
+                <img src="${b.image_url}" alt="Promo Banner" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}" id="banner-${i}">
             `).join('');
             
             let buttonsHtml = bannersData.length > 1 ? `
-                <button onclick="prevBanner(event)" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/90 p-2 md:p-3 rounded-full shadow-md z-20 transition-all backdrop-blur-sm text-gray-800 rtl:right-2 rtl:left-auto rtl:md:right-4 hover:scale-110 active:scale-95">
+                <button onclick="prevBanner(event)" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/90 p-2 md:p-3 rounded-full shadow-md z-20 transition-all backdrop-blur-sm text-gray-800 rtl:right-2 rtl:left-auto rtl:md:right-4 hover:scale-110 active:scale-95" aria-label="Previous Banner">
                     <i class="ph-bold ph-caret-left text-xl"></i>
                 </button>
-                <button onclick="nextBanner(event)" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/90 p-2 md:p-3 rounded-full shadow-md z-20 transition-all backdrop-blur-sm text-gray-800 rtl:left-2 rtl:right-auto rtl:md:left-4 hover:scale-110 active:scale-95">
+                <button onclick="nextBanner(event)" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/90 p-2 md:p-3 rounded-full shadow-md z-20 transition-all backdrop-blur-sm text-gray-800 rtl:left-2 rtl:right-auto rtl:md:left-4 hover:scale-110 active:scale-95" aria-label="Next Banner">
                     <i class="ph-bold ph-caret-right text-xl"></i>
                 </button>
             ` : '';
@@ -759,7 +762,7 @@ const dict = {
             ` + categoriesData.map(c => `
                 <div class="flex flex-col items-center gap-2 cursor-pointer snap-start shrink-0 group ${currentFilter === c.id ? '' : 'opacity-50'}" onclick="filterCategory('${c.id}')">
                     <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white shadow-sm flex items-center justify-center border-2 p-3 ${currentFilter === c.id ? 'border-primary' : 'border-transparent group-hover:border-primary/30'} transition-all group-active:scale-95">
-                        <img src="${c.icon_url}" class="w-full h-full object-contain">
+                        <img src="${c.icon_url}" alt="${c.name_en || c.title || 'Category'}" loading="lazy" width="100" height="100" class="w-full h-full object-contain">
                     </div>
                     <span class="text-xs md:text-sm font-bold ${currentFilter === c.id ? 'text-primary' : 'text-gray-600'}">${isArabic ? c.name_ar : c.name_en}</span>
                 </div>
@@ -771,7 +774,7 @@ const dict = {
                 mcContainer.innerHTML = categoriesData.map(c => `
                     <div class="flex flex-col items-center gap-2 cursor-pointer" onclick=\"openCategoryView('${c.id}'); closeMobileCategories();\">
                         <div class="w-full aspect-square rounded-2xl bg-gray-50 flex items-center justify-center p-4">
-                            <img src="${c.icon_url}" class="w-full h-full object-contain">
+                            <img src="${c.icon_url}" alt="${c.name_en || c.title || 'Category'}" loading="lazy" width="100" height="100" class="w-full h-full object-contain">
                         </div>
                         <span class="text-xs font-bold text-center">${isArabic ? c.name_ar : c.name_en}</span>
                     </div>
@@ -810,7 +813,7 @@ const dict = {
                 <div class="bg-white rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 flex flex-col h-full" onclick="openProductModal('${p.id}')">
                     <div class="relative w-full aspect-square rounded-xl bg-[#F7F7F7] mb-3 md:mb-4 overflow-hidden">
                         ${p.discount_pct ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm z-20">-${p.discount_pct}%</div>` : ''}
-                        <img src="${img}" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
+                        <img src="${img}" alt="${p.title}" loading="lazy" width="400" height="400" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute bottom-2 right-2 md:bottom-3 md:right-3 flex items-center gap-2 z-10">
                             <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); renderProducts();">
                                 <i class="ph-fill ph-heart md:text-lg"></i>
@@ -873,7 +876,7 @@ const dict = {
             document.getElementById('pm_slider').innerHTML = images.map((img, i) => `
                 <div class="w-full h-full flex-shrink-0 flex items-center justify-center p-6 relative" id="pm_slide_${i}">
                     ${(prod.discount_pct && i === 0) ? `<div class="absolute top-6 left-6 rtl:right-6 rtl:left-auto bg-red-500 text-white text-sm md:text-base font-bold px-3 py-1 rounded shadow-md z-20">-${prod.discount_pct}%</div>` : ''}
-                    <img src="${img}" class="max-w-full max-h-full object-contain drop-shadow-xl">
+                    <img src="${img}" alt="${prod.title}" loading="lazy" width="600" height="600" class="max-w-full max-h-full object-contain drop-shadow-xl">
                 </div>
             `).join('');
             
@@ -1027,7 +1030,7 @@ const dict = {
                     const img = (item.images && item.images.length > 0) ? item.images[0] : item.image_url;
                     return `
                     <div class="flex gap-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
-                        <img src="${img}" class="w-20 h-20 object-contain bg-gray-50 rounded-xl cursor-pointer active:scale-95 transition-transform" onclick="toggleCart(); openProductModal('${item.id}')">
+                        <img src="${img}" alt="${item.title}" loading="lazy" width="80" height="80" class="w-20 h-20 object-contain bg-gray-50 rounded-xl cursor-pointer active:scale-95 transition-transform" onclick="toggleCart(); openProductModal('${item.id}')">
                         <div class="flex-1 flex flex-col justify-between py-1">
                             <div class="cursor-pointer active:opacity-50 transition-opacity" onclick="toggleCart(); openProductModal('${item.id}')">
                                 <h4 class="font-bold text-sm text-gray-800 line-clamp-2">${item.title}</h4>
@@ -1035,11 +1038,11 @@ const dict = {
                             </div>
                             <div class="flex items-center justify-between mt-2">
                                 <div class="flex items-center bg-gray-50 rounded-lg border border-gray-200">
-                                    <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors" onclick="changeQty('${item.id}', -1)"><i class="ph-bold ph-minus"></i></button>
+                                    <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors" onclick="changeQty('${item.id}', -1)" aria-label="Decrease Quantity"><i class="ph-bold ph-minus"></i></button>
                                     <span class="w-6 text-center font-bold text-sm select-none">${item.qty}</span>
-                                    <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors" onclick="changeQty('${item.id}', 1)"><i class="ph-bold ph-plus"></i></button>
+                                    <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors" onclick="changeQty('${item.id}', 1)" aria-label="Increase Quantity"><i class="ph-bold ph-plus"></i></button>
                                 </div>
-                                <button class="text-red-400 hover:text-red-500 p-2" onclick="removeFromCart('${item.id}')"><i class="ph-bold ph-trash text-lg"></i></button>
+                                <button class="text-red-400 hover:text-red-500 p-2" onclick="removeFromCart('${item.id}')" aria-label="Remove Item"><i class="ph-bold ph-trash text-lg"></i></button>
                             </div>
                         </div>
                     </div>
@@ -1106,7 +1109,7 @@ const dict = {
                 <div class="bg-white rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 flex flex-col h-full" onclick="openProductModal('${p.id}')">
                     <div class="relative w-full aspect-square rounded-xl bg-[#F7F7F7] mb-3 md:mb-4 overflow-hidden">
                         ${p.discount_pct ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm z-20">-${p.discount_pct}%</div>` : ''}
-                        <img src="${img}" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
+                        <img src="${img}" alt="${p.title}" loading="lazy" width="400" height="400" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute bottom-2 right-2 md:bottom-3 md:right-3 flex items-center gap-2 z-10">
                             <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); renderCategoryViewProducts('${categoryId}'); renderProducts();">
                                 <i class="ph-fill ph-heart md:text-lg"></i>
@@ -1199,7 +1202,7 @@ const dict = {
                 <div class="bg-white rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 flex flex-col h-full" onclick="openProductModal('${p.id}')">
                     <div class="relative w-full aspect-square rounded-xl bg-[#F7F7F7] mb-3 md:mb-4 overflow-hidden">
                         ${p.discount_pct ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded shadow-sm z-20">-${p.discount_pct}%</div>` : ''}
-                        <img src="${img}" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
+                        <img src="${img}" alt="${p.title}" loading="lazy" width="400" height="400" class="absolute inset-0 w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute bottom-2 right-2 md:bottom-3 md:right-3 flex items-center gap-2 z-10">
                             <button class="bg-white hover:bg-gray-100 ${favorites.includes(p.id) ? 'text-red-500' : 'text-gray-300'} w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-colors" onclick="event.stopPropagation(); toggleFavorite('${p.id}', event); window.renderDiscountView();">
                                 <i class="ph-fill ph-heart md:text-lg"></i>
@@ -1536,7 +1539,7 @@ const dict = {
                                 const img = prod ? (prod.images && prod.images.length > 0 ? prod.images[0] : prod.image_url) : 'https://placehold.co/100x100?text=No+Image';
                                 return `
                                 <div class="flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
-                                    <img src="${img}" class="w-12 h-12 object-contain bg-gray-50 rounded cursor-pointer hover:opacity-80 transition-opacity" onclick="openLightbox('${img}', event)">
+                                    <img src="${img}" alt="${i.title}" loading="lazy" width="48" height="48" class="w-12 h-12 object-contain bg-gray-50 rounded cursor-pointer hover:opacity-80 transition-opacity" onclick="openLightbox('${img}', event)">
                                     <div class="flex-1 min-w-0">
                                         <div class="text-xs font-bold text-gray-700 truncate">${i.title}</div>
                                         <div class="text-[10px] text-gray-500">Qty: ${i.qty} &times; ${formatIQD(i.price)}</div>
@@ -1879,7 +1882,7 @@ const dict = {
     <!-- Settings Fullscreen Modal -->
     <div id="settingsModal" class="fixed inset-0 z-[100] bg-white hidden flex-col transition-transform duration-300 translate-x-full">
         <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-white">
-            <button onclick="closeSettings()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"><i class="ph-bold ph-x"></i></button>
+            <button onclick="closeSettings()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors" aria-label="Close"><i class="ph-bold ph-x"></i></button>
             <h2 class="font-bold text-xl text-gray-800" id="stg_title">Settings</h2>
             <div class="w-10"></div> <!-- Spacer -->
         </div>
@@ -1911,7 +1914,7 @@ const dict = {
         <button class="absolute top-6 right-6 z-10 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full backdrop-blur transition-colors">
             <i class="ph-bold ph-x text-2xl"></i>
         </button>
-        <img id="lightboxImg" src="" class="max-w-[95%] max-h-[95%] object-contain drop-shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+        <img id="lightboxImg" src="" alt="Full screen product image" loading="lazy" width="800" height="800" class="max-w-[95%] max-h-[95%] object-contain drop-shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
     </div>
 
 
