@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://encrypted-tbn0.gstatic.com">
     <link rel="preconnect" href="https://phgldyvshihyzimbwxci.supabase.co">
-    <link rel="preload" as="image" href="hero.webp" fetchpriority="high" id="heroPreload">
+    
     <meta name="description" content="IQ Mart - E-commerce store for top quality products in Iraq">
     <title>IQ Mart</title>
     
@@ -686,7 +686,7 @@ const dict = {
             heroCurrentIndex = 0;
             
             let imagesHtml = bannersData.map((b, i) => `
-                <img src="${i === 0 ? 'hero.webp' : b.image_url}" alt="Promo Banner" width="800" height="400" fetchpriority="high" loading="eager" decoding="async" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}" id="banner-${i}">
+                <img src="${b.image_url}" alt="Promo Banner" width="800" height="400" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}" id="banner-${i}">
             `).join('');
             
             let buttonsHtml = bannersData.length > 1 ? `
