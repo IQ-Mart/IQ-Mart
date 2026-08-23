@@ -215,9 +215,12 @@
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1 ms-1 flex justify-between items-center">
                         <span id="co_lbl_loc">Location / Address</span>
-                        <button onclick="locateMe()" class="text-blue-500 hover:text-blue-600 text-xs flex items-center gap-1 font-bold bg-blue-50 px-2 py-1 rounded">
-                            <i class="ph-bold ph-crosshair"></i> <span id="co_btn_locate">Locate Me</span>
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-gray-400 font-normal" id="co_click_hint">Click here -></span>
+                            <button onclick="locateMe()" class="text-blue-500 hover:text-blue-600 text-xs flex items-center gap-1 font-bold bg-blue-50 px-2 py-1 rounded">
+                                <i class="ph-bold ph-crosshair"></i> <span id="co_btn_locate">Locate Me</span>
+                            </button>
+                        </div>
                     </label>
                     <input type="text" id="co_loc" aria-label="Detailed Location" placeholder="Type or click Locate Me" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary">
                 </div>
@@ -226,7 +229,7 @@
                     <label class="block text-sm font-bold text-gray-700 mb-1 ms-1">Promo Code</label>
                     <div class="flex gap-2">
                         <input type="text" id="co_promo" aria-label="Promo Code" placeholder="Optional" class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:border-primary uppercase">
-                        <button onclick="applyPromoCode()" class="bg-gray-900 text-white px-6 font-bold rounded-xl hover:bg-gray-800 transition-colors">Apply</button>
+                        <button id="promo_btn" onclick="applyPromoCode()" class="bg-gray-900 text-white px-4 md:px-5 text-lg font-bold rounded-xl hover:bg-gray-800 transition-colors">✔</button>
                     </div>
                     <div id="promo_msg" class="text-sm font-bold mt-2 hidden"></div>
                 </div>
@@ -285,8 +288,8 @@
             <!-- Right Side in LTR (Images Slider) -->
             <div class="relative w-full md:w-1/2 h-80 md:h-screen bg-[#F7F7F7] flex-shrink-0 group order-1 md:order-2 border-b md:border-b-0 md:border-s border-gray-100">
                 <div class="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar items-center" style="scroll-behavior: smooth;" id="pm_slider"></div>
-                <button id="pm_prev" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hidden z-10" onclick="scrollPmSlider(-1)" aria-label="Previous Image"><i class="ph-bold ph-caret-left"></i></button>
-                <button id="pm_next" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hidden z-10" onclick="scrollPmSlider(1)" aria-label="Next Image"><i class="ph-bold ph-caret-right"></i></button>
+                <button id="pm_prev" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-gray-800 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hidden z-10" onclick="scrollPmSlider(-1)" aria-label="Previous Image"><i class="ph-bold ph-caret-left"></i></button>
+                <button id="pm_next" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-gray-800 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hidden z-10" onclick="scrollPmSlider(1)" aria-label="Next Image"><i class="ph-bold ph-caret-right"></i></button>
                 <div class="absolute bottom-6 left-0 w-full flex justify-center gap-2 z-10" id="pm_dots"></div>
             </div>
             
@@ -331,7 +334,7 @@
             <h2 class="text-xl md:text-2xl font-bold text-gray-800" id="mc_title">All Categories</h2>
             <button onclick="closeMobileCategories()" class="p-2 md:p-3 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full" aria-label="Close"><i class="ph-bold ph-x md:text-xl"></i></button>
         </div>
-        <div class="p-4 md:p-8 grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4 md:gap-6" id="mobileCatContainer"></div>
+        <div class="p-4 md:p-6 flex flex-col gap-3 max-w-xl mx-auto w-full" id="mobileCatContainer"></div>
     </div>
 
     
@@ -587,6 +590,7 @@ const dict = {
                 coCity: "City",
                 coLoc: "Location / Address",
                 coLocate: "Locate Me",
+                coClickHint: "Click here ->",
                 coSubmit: "Place Order",
                 mcTitle: "All Categories",
                 statusPending: "Pending",
@@ -802,19 +806,21 @@ const dict = {
             const mcContainer = document.getElementById('mobileCatContainer');
             if(mcContainer) {
                 const allCatBtn = `
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="closeMobileCategories(); openCategoryView('all');">
-                        <div class="w-full aspect-square rounded-2xl bg-primary/5 group-hover:bg-primary/10 transition-colors flex items-center justify-center p-4 border border-primary/20">
-                            <i class="ph-fill ph-squares-four text-3xl md:text-4xl text-primary"></i>
+                    <div class="flex items-center gap-4 cursor-pointer group bg-white hover:bg-gray-50 p-3 rounded-2xl border border-gray-100 transition-colors shadow-sm" onclick="closeMobileCategories(); openCategoryView('all');">
+                        <div class="w-12 h-12 shrink-0 rounded-xl bg-primary/5 group-hover:bg-primary/10 transition-colors flex items-center justify-center p-2 border border-primary/20">
+                            <i class="ph-fill ph-squares-four text-2xl text-primary"></i>
                         </div>
-                        <span class="text-xs md:text-sm font-bold text-center text-primary">${isArabic ? 'الكل' : 'All'}</span>
+                        <span class="text-sm md:text-base font-bold text-gray-800 flex-1 rtl:text-right text-left">${isArabic ? 'الكل' : 'All'}</span>
+                        <i class="ph-bold ph-caret-right text-gray-400 rtl:rotate-180"></i>
                     </div>
                 `;
                 mcContainer.innerHTML = allCatBtn + categoriesData.map(c => `
-                    <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="openCategoryView('${c.id}'); closeMobileCategories();">
-                        <div class="w-full aspect-square rounded-2xl bg-gray-50 group-hover:bg-gray-100 transition-colors flex items-center justify-center p-4">
+                    <div class="flex items-center gap-4 cursor-pointer group bg-white hover:bg-gray-50 p-3 rounded-2xl border border-gray-100 transition-colors shadow-sm" onclick="openCategoryView('${c.id}'); closeMobileCategories();">
+                        <div class="w-12 h-12 shrink-0 rounded-xl bg-gray-50 group-hover:bg-gray-100 transition-colors flex items-center justify-center p-2">
                             <img src="${c.icon_url}" alt="${c.name_en || c.title || 'Category'}" loading="lazy" width="100" height="100" class="w-full h-full object-contain group-hover:scale-110 transition-transform" decoding="async">
                         </div>
-                        <span class="text-xs md:text-sm font-bold text-center text-gray-700">${isArabic ? c.name_ar : c.name_en}</span>
+                        <span class="text-sm md:text-base font-bold text-gray-700 flex-1 rtl:text-right text-left">${isArabic ? c.name_ar : c.name_en}</span>
+                        <i class="ph-bold ph-caret-right text-gray-400 rtl:rotate-180"></i>
                     </div>
                 `).join('');
             }
@@ -913,7 +919,7 @@ const dict = {
             
             if(images.length > 1) {
                 document.getElementById('pm_dots').innerHTML = images.map((_, i) => `
-                    <button class="${i === 0 ? 'w-2.5 h-2.5 rounded-full bg-primary transition-all duration-300 transform scale-110' : 'w-2 h-2 rounded-full bg-gray-300 transition-all duration-300'}" onclick="document.getElementById('pm_slider').scroll({left: ${i} * document.getElementById('pm_slider').clientWidth, behavior: 'smooth'})" aria-label="Go to slide ${i + 1}"></button>
+                    <button class="${i === 0 ? 'w-2.5 h-2.5 rounded-full bg-primary transition-all duration-300 transform scale-110' : 'w-2 h-2 rounded-full bg-gray-300 transition-all duration-300'}" onclick="document.getElementById('pm_slider').scroll({left: ${i} * document.getElementById('pm_slider').clientWidth * (isArabic ? -1 : 1), behavior: 'smooth'})" aria-label="Go to slide ${i + 1}"></button>
                 `).join('');
                 document.getElementById('pm_prev').classList.remove('hidden');
                 document.getElementById('pm_next').classList.remove('hidden');
@@ -1141,6 +1147,12 @@ const dict = {
             // Reset Promo
             window.activePromo = null;
             document.getElementById('co_promo').value = '';
+            document.getElementById('co_promo').disabled = false;
+            const pBtn = document.getElementById('promo_btn');
+            if(pBtn) {
+                pBtn.textContent = '✔';
+                pBtn.className = 'bg-gray-900 text-white px-4 md:px-5 text-lg font-bold rounded-xl hover:bg-gray-800 transition-colors';
+            }
             const msg = document.getElementById('promo_msg');
             msg.classList.add('hidden');
             msg.className = 'text-sm font-bold mt-2 hidden';
@@ -1158,46 +1170,71 @@ const dict = {
         
         window.activePromo = null;
         const applyPromoCode = async () => {
-            const codeInput = document.getElementById('co_promo').value.trim().toUpperCase();
+            const promoInput = document.getElementById('co_promo');
+            const promoBtn = document.getElementById('promo_btn');
             const msg = document.getElementById('promo_msg');
             
+            // If already active, this acts as a REMOVE button
+            if (window.activePromo) {
+                window.activePromo = null;
+                promoInput.value = '';
+                promoInput.disabled = false;
+                promoBtn.textContent = '✔';
+                promoBtn.className = 'bg-gray-900 text-white px-4 md:px-5 text-lg font-bold rounded-xl hover:bg-gray-800 transition-colors';
+                msg.classList.add('hidden');
+                msg.className = 'text-sm font-bold mt-2 hidden';
+                msg.innerText = '';
+                
+                // Recalculate Total
+                const baseTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                document.getElementById('co_total_old').classList.add('hidden');
+                document.getElementById('co_total_new').innerHTML = formatIQD(baseTotal);
+                return;
+            }
+
+            const codeInput = promoInput.value.trim().toUpperCase();
             if(!codeInput) return;
             
             msg.classList.remove('hidden');
             msg.className = 'text-sm font-bold mt-2 text-gray-500';
-            msg.innerText = 'Checking...';
+            msg.innerText = isArabic ? 'جاري التحقق...' : 'Checking...';
             
             try {
                 const { data, error } = await supaClient.from('promos').select('*').eq('code', codeInput).eq('is_active', true).maybeSingle();
                 
                 if (error || !data) {
                     msg.className = 'text-sm font-bold mt-2 text-red-500';
-                    msg.innerText = 'Invalid or expired promo code.';
+                    msg.innerText = isArabic ? 'كود الخصم غير صالح أو منتهي.' : 'Invalid or expired promo code.';
                     window.activePromo = null;
                 } else {
                     msg.className = 'text-sm font-bold mt-2 text-green-600 bg-green-50 p-2 rounded';
-                    msg.innerText = `Success! ${data.discount_percent}% off applied.`;
+                    msg.innerText = isArabic ? `تم بنجاح! خصم ${data.discount_percent}%` : `Success! ${data.discount_percent}% off applied.`;
                     window.activePromo = data;
+                    
+                    // Lock input and change button
+                    promoInput.disabled = true;
+                    promoBtn.textContent = 'X';
+                    promoBtn.className = 'bg-red-500 text-white px-4 md:px-5 text-lg font-bold rounded-xl hover:bg-red-600 transition-colors';
                 }
                 
                 // Recalculate Total
                 const baseTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
                 if (window.activePromo) {
-                    const discount = (baseTotal * window.activePromo.discount_percent) / 100;
-                    const finalTotal = baseTotal - discount;
+                    const discountAmt = baseTotal * (window.activePromo.discount_percent / 100);
+                    const newTotal = baseTotal - discountAmt;
                     document.getElementById('co_total_old').classList.remove('hidden');
                     document.getElementById('co_total_old').innerHTML = formatIQD(baseTotal);
-                    document.getElementById('co_total_new').innerHTML = formatIQD(finalTotal);
+                    document.getElementById('co_total_new').innerHTML = formatIQD(newTotal);
                 } else {
                     document.getElementById('co_total_old').classList.add('hidden');
                     document.getElementById('co_total_new').innerHTML = formatIQD(baseTotal);
                 }
-            } catch (err) {
-                console.error(err);
-                msg.className = 'text-sm font-bold mt-2 text-red-500';
-                msg.innerText = 'Error checking code.';
+                
+            } catch(e) {
+                console.error(e);
             }
         };
+
 
         const closeCheckoutModal = () => {
             const modal = document.getElementById('checkoutModal');
@@ -1517,6 +1554,8 @@ const dict = {
             document.getElementById('co_lbl_city').textContent = isArabic ? dict.ar.coCity : dict.en.coCity;
             document.getElementById('co_lbl_loc').textContent = isArabic ? dict.ar.coLoc : dict.en.coLoc;
             document.getElementById('co_btn_locate').textContent = isArabic ? dict.ar.coLocate : dict.en.coLocate;
+            const clickHint = document.getElementById('co_click_hint');
+            if (clickHint) clickHint.textContent = isArabic ? dict.ar.coClickHint : dict.en.coClickHint;
             document.getElementById('co_btn_submit').textContent = isArabic ? dict.ar.coSubmit : dict.en.coSubmit;
             document.getElementById('cartTotalText').textContent = isArabic ? dict.ar.total : dict.en.total;
             document.getElementById('mc_title').textContent = isArabic ? dict.ar.mcTitle : dict.en.mcTitle;
@@ -1791,8 +1830,7 @@ const dict = {
         const scrollPmSlider = (dir) => {
             const slider = document.getElementById('pm_slider');
             const width = slider.clientWidth;
-            const index = Math.round(slider.scrollLeft / width);
-            slider.scroll({ left: (index + dir) * width, behavior: 'smooth' });
+            slider.scrollBy({ left: dir * width, behavior: 'smooth' });
         };
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -1800,7 +1838,7 @@ const dict = {
             if (pmSlider) {
                 pmSlider.addEventListener('scroll', () => {
                     const width = pmSlider.clientWidth;
-                    const index = Math.round(pmSlider.scrollLeft / width);
+                    const index = Math.round(Math.abs(pmSlider.scrollLeft) / width);
                     const dots = document.getElementById('pm_dots').children;
                     for (let i = 0; i < dots.length; i++) {
                         dots[i].className = i === index 
@@ -1980,7 +2018,79 @@ const dict = {
             }
         }, 3000); // 3 seconds polling for very fast reaction
 
+
 </script>
+
+    <!-- Settings Fullscreen Modal -->
+    <div id="settingsModal" class="fixed inset-0 z-[100] bg-white hidden flex-col transition-transform duration-300 translate-x-full">
+        <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-white">
+            <button onclick="closeSettings()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"><i class="ph-bold ph-x"></i></button>
+            <h2 class="font-bold text-xl text-gray-800" id="stg_title">Settings</h2>
+            <div class="w-10"></div> <!-- Spacer -->
+        </div>
+        <div class="p-6 space-y-4 flex-1 overflow-y-auto bg-white">
+            <!-- Language -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div class="flex items-center gap-3">
+                    <i class="ph-fill ph-translate text-2xl text-primary"></i>
+                    <span class="font-bold text-gray-800" id="stg_lang">Language</span>
+                </div>
+                <button onclick="toggleLanguage()" class="font-bold text-sm bg-white shadow-sm px-4 py-2 rounded-xl border border-gray-200" id="stg_lang_btn">English</button>
+            </div>
+            <!-- Theme -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div class="flex items-center gap-3">
+                    <i class="ph-fill ph-moon text-2xl text-primary"></i>
+                    <span class="font-bold text-gray-800" id="stg_theme">Dark Mode</span>
+                </div>
+                <button onclick="toggleDarkMode()" class="w-12 h-6 bg-gray-300 rounded-full relative transition-colors cursor-pointer" id="stg_theme_toggle">
+                    <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform shadow-sm" id="stg_theme_knob"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Cancel Contact Modal -->
+    <div id="cancelContactModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300 px-4" onclick="closeCancelContact()">
+        <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300 p-6 flex flex-col gap-4 text-center relative" onclick="event.stopPropagation()">
+            <button onclick="closeCancelContact()" class="absolute top-4 right-4 rtl:left-4 rtl:right-auto text-gray-400 hover:text-gray-800 transition-colors">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i class="ph-bold ph-phone-call text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-black text-gray-800" id="cc_title">Contact to Cancel</h3>
+            <p class="text-sm text-gray-500 font-medium leading-relaxed" id="cc_desc">
+                To cancel your order, please contact our support team at <br><b class="text-xl text-gray-800 tracking-wider mt-2 block">07509214005</b>
+            </p>
+            
+            <div class="grid grid-cols-3 gap-2 mt-4">
+                <a href="tel:+9647509214005" class="flex flex-col items-center justify-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-100 p-3 rounded-xl transition-colors">
+                    <i class="ph-fill ph-phone text-2xl"></i>
+                    <span class="text-xs font-bold">Call</span>
+                </a>
+                <a href="https://wa.me/9647509214005" target="_blank" class="flex flex-col items-center justify-center gap-2 bg-green-50 text-green-600 hover:bg-green-100 p-3 rounded-xl transition-colors">
+                    <i class="ph-fill ph-whatsapp-logo text-2xl"></i>
+                    <span class="text-xs font-bold">WhatsApp</span>
+                </a>
+                <a href="viber://chat?number=+9647509214005" class="flex flex-col items-center justify-center gap-2 bg-purple-50 text-purple-600 hover:bg-purple-100 p-3 rounded-xl transition-colors">
+                    <i class="ph-fill ph-chat-circle-text text-2xl"></i>
+                    <span class="text-xs font-bold">Viber</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Lightbox Modal -->
+    <div id="imageLightbox" class="fixed inset-0 bg-black/95 z-[100] hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeLightbox()">
+        <button class="absolute top-6 right-6 z-10 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full backdrop-blur transition-colors">
+            <i class="ph-bold ph-x text-2xl"></i>
+        </button>
+        <img id="lightboxImg" src="" class="max-w-[95%] max-h-[95%] object-contain drop-shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+    </div>
+
 
     <!-- Embedded PWA Manifest & Service Worker -->
     <script>
@@ -2041,76 +2151,5 @@ const dict = {
             }
         })();
     </script>
-
-    <!-- Settings Fullscreen Modal -->
-    <div id="settingsModal" class="fixed inset-0 z-[100] bg-white hidden flex-col transition-transform duration-300 translate-x-full">
-        <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-white">
-            <button onclick="closeSettings()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors" aria-label="Close"><i class="ph-bold ph-x"></i></button>
-            <h2 class="font-bold text-xl text-gray-800" id="stg_title">Settings</h2>
-            <div class="w-10"></div> <!-- Spacer -->
-        </div>
-        <div class="p-6 space-y-4 flex-1 overflow-y-auto bg-white">
-            <!-- Language -->
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                <div class="flex items-center gap-3">
-                    <i class="ph-fill ph-translate text-2xl text-primary"></i>
-                    <span class="font-bold text-gray-800" id="stg_lang">Language</span>
-                </div>
-                <button onclick="toggleLanguage()" class="font-bold text-sm bg-white shadow-sm px-4 py-2 rounded-xl border border-gray-200" id="stg_lang_btn">English</button>
-            </div>
-            <!-- Theme -->
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                <div class="flex items-center gap-3">
-                    <i class="ph-fill ph-moon text-2xl text-primary"></i>
-                    <span class="font-bold text-gray-800" id="stg_theme">Dark Mode</span>
-                </div>
-                <button onclick="toggleDarkMode()" class="w-12 h-6 bg-gray-300 rounded-full relative transition-colors cursor-pointer" id="stg_theme_toggle">
-                    <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform shadow-sm" id="stg_theme_knob"></div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Lightbox Modal -->
-    <div id="imageLightbox" class="fixed inset-0 bg-black/95 z-[100] hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeLightbox()">
-        <button aria-label="Close Lightbox" class="absolute top-6 right-6 z-10 text-white bg-white/20 hover:bg-white/40 p-2 rounded-full backdrop-blur transition-colors">
-            <i class="ph-bold ph-x text-2xl"></i>
-        </button>
-        <img id="lightboxImg" src="" alt="Full screen product image" loading="lazy" width="800" height="800" class="max-w-[95%] max-h-[95%] object-contain drop-shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()" decoding="async">
-    </div>
-
-
-    <!-- Cancel Contact Modal -->
-    <div id="cancelContactModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300 px-4" onclick="closeCancelContact()">
-        <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl transform scale-95 transition-transform duration-300 p-6 flex flex-col gap-4 text-center relative" onclick="event.stopPropagation()">
-            <button onclick="closeCancelContact()" aria-label="Close Contact" class="absolute top-4 right-4 rtl:left-4 rtl:right-auto text-gray-600 hover:text-gray-800 transition-colors">
-                <i class="ph-bold ph-x text-xl"></i>
-            </button>
-            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                <i class="ph-bold ph-phone-call text-3xl"></i>
-            </div>
-            <h3 class="text-xl font-black text-gray-800" id="cc_title">Contact to Cancel</h3>
-            <p class="text-sm text-gray-600 font-medium leading-relaxed" id="cc_desc">
-                To cancel your order, please contact our support team at <br><b class="text-xl text-gray-800 tracking-wider mt-2 block">07509214005</b>
-            </p>
-            
-            <div class="grid grid-cols-3 gap-2 mt-4">
-                <a href="tel:+9647509214005" class="flex flex-col items-center justify-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-100 p-3 rounded-xl transition-colors">
-                    <i class="ph-fill ph-phone text-2xl"></i>
-                    <span class="text-xs font-bold">Call</span>
-                </a>
-                <a href="https://wa.me/9647509214005" target="_blank" class="flex flex-col items-center justify-center gap-2 bg-green-50 text-green-600 hover:bg-green-100 p-3 rounded-xl transition-colors">
-                    <i class="ph-fill ph-whatsapp-logo text-2xl"></i>
-                    <span class="text-xs font-bold">WhatsApp</span>
-                </a>
-                <a href="viber://chat?number=+9647509214005" class="flex flex-col items-center justify-center gap-2 bg-purple-50 text-purple-600 hover:bg-purple-100 p-3 rounded-xl transition-colors">
-                    <i class="ph-fill ph-chat-circle-text text-2xl"></i>
-                    <span class="text-xs font-bold">Viber</span>
-                </a>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>
