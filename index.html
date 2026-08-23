@@ -292,11 +292,13 @@
                 <div class="p-6 md:p-10 flex-1 flex flex-col justify-center">
                     <span class="text-[11px] font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded mb-3 inline-block w-fit select-all" id="pm_id"></span>
                     <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-2 leading-tight" id="pm_title"></h2>
+                    <div class="flex items-center gap-2 mb-4" id="pm_rating_container"></div>
                     <p class="text-primary font-bold text-2xl md:text-3xl mb-6" id="pm_price"></p>
-                    <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 mb-6 flex-1">
+                    <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 mb-6 flex-1 flex flex-col">
                         <h4 class="font-bold text-sm text-gray-600 mb-3 uppercase tracking-wider" id="pm_desc_title">Description</h4>
                         <p class="text-gray-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap" id="pm_desc"></p>
                     </div>
+                    <div id="pm_info_groups" class="w-full flex flex-col gap-4 mb-6"></div>
                     <div class="flex gap-2 md:gap-3">
                         <button id="pm_share_btn" class="w-14 h-14 md:w-16 md:h-16 shrink-0 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-2xl flex items-center justify-center transition-colors border border-gray-200" title="Share" aria-label="Share">
                             <i class="ph-bold ph-share-network text-2xl"></i>
@@ -311,6 +313,9 @@
                     
                     <!-- Related Products (AOV) -->
                     <div id="pm_related_products" class="w-full mt-8 hidden border-t border-gray-100 pt-6"></div>
+                    
+                    <!-- Comments Section -->
+                    <div id="pm_comments_section" class="w-full mt-2"></div>
                     
                 </div>
             </div>
@@ -515,6 +520,8 @@
 
         let isArabic = localStorage.getItem('lang') === 'ar';
         let cart = [];
+        let commentsData = [];
+        let ratingsData = [];
         let productsData = [];
         let categoriesData = [];
         let bannersData = [];
@@ -661,6 +668,195 @@ const dict = {
             return parseInt(priceStr.toString().replace(/,/g, ''), 10) || 0;
         };
         const formatIQD = (num) => new Intl.NumberFormat('en-US').format(num) + ' IQD';
+
+        const renderComments = (productId) => {
+            const container = document.getElementById('pm_comments_section');
+            if (!container) return;
+            
+            const prodComments = commentsData.filter(c => c.product_id === productId).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            
+            let html = `
+                <div class="border-t border-gray-100 pt-8 mt-4">
+                    <h3 class="font-black text-xl text-gray-900 mb-4">${isArabic ? 'التعليقات' : 'Comments'}</h3>
+                    
+                    <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100 shadow-sm">
+                        <div class="flex flex-col gap-3">
+                            <input type="text" id="commentName" placeholder="${isArabic ? 'الاسم...' : 'Your Name...'}" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 font-medium">
+                            <textarea id="commentText" rows="3" placeholder="${isArabic ? 'أضف تعليقك...' : 'Write a comment...'}" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
+                            <button onclick="submitComment('${productId}')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-md shadow-yellow-500/20 text-sm self-end" style="background-color: #eab308 !important; color: white !important;">${isArabic ? 'نشر التعليق' : 'Post Comment'}</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-4">
+            `;
+            
+            if (prodComments.length === 0) {
+                html += `<p class="text-sm text-gray-500 text-center py-6 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">${isArabic ? 'لا توجد تعليقات بعد. كن أول من يعلق!' : 'No comments yet. Be the first to comment!'}</p>`;
+            } else {
+                prodComments.forEach(c => {
+                    const nameStr = c.author_name || 'Anonymous';
+                    const initial = nameStr.charAt(0).toUpperCase();
+                    const colors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500'];
+                    const color = colors[nameStr.length % colors.length];
+                    
+                    html += `
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 rounded-full ${color} text-white flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-sm">
+                                ${initial}
+                            </div>
+                            <div class="flex flex-col bg-gray-50 rounded-2xl p-4 flex-1 border border-gray-100 shadow-sm">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-black text-sm text-gray-900">${nameStr}</span>
+                                    <span class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">${new Date(c.created_at).toLocaleDateString()}</span>
+                                </div>
+                                <span class="text-sm text-gray-700 leading-relaxed">${c.content}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `</div></div>`;
+            container.innerHTML = html;
+        };
+
+        window.submitComment = async (productId) => {
+            const nameEl = document.getElementById('commentName');
+            const textEl = document.getElementById('commentText');
+            const author_name = nameEl.value.trim();
+            const content = textEl.value.trim();
+            
+            if (!author_name || !content) {
+                showToast(isArabic ? 'الرجاء إدخال الاسم والتعليق' : 'Please enter both name and comment', true);
+                return;
+            }
+            
+            const newComment = {
+                id: Date.now().toString(),
+                product_id: productId,
+                author_name,
+                content,
+                created_at: new Date().toISOString()
+            };
+            
+            commentsData.push(newComment);
+            renderComments(productId);
+            
+            showToast(isArabic ? 'تم نشر التعليق بنجاح!' : 'Comment posted successfully!');
+            
+            try {
+                await supaClient.from('comments').insert([{ product_id: productId, author_name, content }]);
+            } catch(e) {}
+        };
+
+        const getProductRating = (productId) => {
+            const prodRatings = ratingsData.filter(r => r.product_id === productId);
+            if(prodRatings.length === 0) return { avg: 0, count: 0 };
+            const avg = prodRatings.reduce((sum, r) => sum + r.stars, 0) / prodRatings.length;
+            return { avg, count: prodRatings.length };
+        };
+
+        const renderStarsHtml = (avg, count) => {
+            let starsHtml = '';
+            for(let i=1; i<=5; i++) {
+                if (avg >= i) starsHtml += '<i class="ph-fill ph-star text-yellow-400"></i>';
+                else if (avg >= i - 0.5) starsHtml += '<i class="ph-fill ph-star-half text-yellow-400"></i>';
+                else starsHtml += '<i class="ph-fill ph-star text-gray-200"></i>';
+            }
+            return `
+                <div class="flex items-center gap-1 text-sm">
+                    <div class="flex items-center">${starsHtml}</div>
+                    <span class="font-bold text-gray-700 ml-1 text-xs">${avg > 0 ? avg.toFixed(1) : ''} <span class="text-gray-400 font-normal">(${count})</span></span>
+                </div>
+            `;
+        };
+
+        let currentRatingProductId = null;
+        let selectedStars = 0;
+        let hoverStars = 0;
+
+        window.openRatingModal = (id) => {
+            currentRatingProductId = id;
+            selectedStars = parseInt(localStorage.getItem(`rated_${id}`) || '0');
+            hoverStars = 0;
+            
+            document.getElementById('rm_title').textContent = isArabic ? 'تقييم المنتج' : 'Rate Product';
+            document.getElementById('rm_desc').textContent = isArabic ? 'اختر عدد النجوم' : 'Tap a star to select.';
+            
+            document.getElementById('rm_submit_btn').classList.add('hidden');
+            document.getElementById('rm_submit_btn').textContent = isArabic ? 'تأكيد التقييم' : 'Apply Rating';
+            
+            window.renderModalStars();
+            document.getElementById('ratingModal').classList.replace('hidden', 'flex');
+        };
+
+        window.renderModalStars = () => {
+            let html = '';
+            for(let i=1; i<=5; i++) {
+                const isFilled = i <= selectedStars;
+                const starClass = isFilled ? 'text-yellow-400' : 'text-gray-300';
+                html += `<button id="rm_star_${i}" type="button" onmouseenter="window.setHover(${i})" onmouseleave="window.clearHover()" onclick="window.selectStar(${i})" class="text-5xl hover:scale-110 transition-transform ${starClass}"><i class="${isFilled ? 'ph-fill' : 'ph'} ph-star"></i></button>`;
+            }
+            document.getElementById('ratingModalStars').innerHTML = html;
+        };
+
+        window.setHover = (val) => { 
+            const alreadyRated = localStorage.getItem(`rated_${currentRatingProductId}`);
+            if(alreadyRated) return; // disable hover if already rated
+            for(let i=1; i<=5; i++) {
+                const btn = document.getElementById(`rm_star_${i}`);
+                if(btn) {
+                    btn.className = `text-5xl hover:scale-110 transition-transform ${i <= val ? 'text-yellow-400' : 'text-gray-300'}`;
+                    btn.innerHTML = `<i class="${i <= val ? 'ph-fill' : 'ph'} ph-star"></i>`;
+                }
+            }
+        };
+        
+        window.clearHover = () => { 
+            const alreadyRated = localStorage.getItem(`rated_${currentRatingProductId}`);
+            if(alreadyRated) return;
+            for(let i=1; i<=5; i++) {
+                const btn = document.getElementById(`rm_star_${i}`);
+                if(btn) {
+                    btn.className = `text-5xl hover:scale-110 transition-transform ${i <= selectedStars ? 'text-yellow-400' : 'text-gray-300'}`;
+                    btn.innerHTML = `<i class="${i <= selectedStars ? 'ph-fill' : 'ph'} ph-star"></i>`;
+                }
+            }
+        };
+        
+        window.selectStar = (val) => { 
+            const alreadyRated = localStorage.getItem(`rated_${currentRatingProductId}`);
+            if(alreadyRated) {
+                showToast(isArabic ? 'لقد قمت بتقييم هذا المنتج مسبقاً' : 'You already rated this product', true);
+                return;
+            }
+            selectedStars = val; 
+            window.clearHover(); 
+            document.getElementById('rm_submit_btn').classList.remove('hidden');
+        };
+
+        const submitRating = async () => {
+            if(!currentRatingProductId || selectedStars === 0) return;
+            
+            const alreadyRated = localStorage.getItem(`rated_${currentRatingProductId}`);
+            if(alreadyRated) {
+                showToast(isArabic ? 'لقد قمت بتقييم هذا المنتج مسبقاً' : 'You already rated this product', true);
+                return;
+            }
+            
+            localStorage.setItem(`rated_${currentRatingProductId}`, selectedStars);
+            ratingsData.push({ product_id: currentRatingProductId, stars: selectedStars, is_local: true });
+            
+            document.getElementById('ratingModal').classList.replace('flex', 'hidden');
+            showToast(isArabic ? 'تم حفظ التقييم!' : 'Rating applied!');
+            
+            const modalOpen = !document.getElementById('productModal').classList.contains('hidden');
+            if(modalOpen) openProductModal(currentRatingProductId);
+            renderProducts();
+            if(window.renderSearchView) renderSearchView();
+            
+            try { await supaClient.from('ratings').insert([{ product_id: currentRatingProductId, stars: selectedStars }]); } catch(e) {}
+        };
 
         const showToast = (msg, isError = false) => {
             const toast = document.getElementById('toast');
@@ -1082,11 +1278,47 @@ const dict = {
             if(!prod) return;
             
             document.getElementById('pm_id').textContent = prod.id;
+            renderComments(prod.id);
             document.getElementById('pm_title').textContent = prod.title;
+            const r = getProductRating(prod.id);
+            document.getElementById('pm_rating_container').innerHTML = `
+                ${renderStarsHtml(r.avg, r.count)}
+                <button onclick="window.openRatingModal('${prod.id}')" class="text-xs text-blue-500 font-bold hover:underline ml-2 bg-blue-50 px-2 py-1 rounded">${isArabic ? 'قيم المنتج' : 'Rate it'}</button>
+            `;
             document.getElementById('pm_price').innerHTML = prod.discount_pct ? 
                 `<span class="text-xl md:text-2xl text-gray-600 line-through mr-3 font-normal">${formatIQD(prod.original_price)}</span>${formatIQD(prod.price)} <span class="bg-red-100 text-red-600 text-sm md:text-base px-3 py-1 rounded-lg ml-2 font-bold shadow-sm">-${prod.discount_pct}%</span>` : 
                 formatIQD(prod.price);
-            document.getElementById('pm_desc').textContent = prod.description || '';
+                        let rawDesc = prod.description || '';
+            let infoGroups = [];
+            try {
+                const parsed = JSON.parse(rawDesc);
+                if (parsed && typeof parsed === 'object' && parsed.text !== undefined) {
+                    rawDesc = parsed.text;
+                    infoGroups = parsed.groups || [];
+                }
+            } catch(e) {}
+            
+            document.getElementById('pm_desc').textContent = rawDesc;
+            
+            const infoContainer = document.getElementById('pm_info_groups');
+            if (infoGroups.length === 0) {
+                infoContainer.innerHTML = '';
+            } else {
+                infoContainer.innerHTML = infoGroups.map(g => `
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        ${g.name ? `<h5 class="font-bold text-gray-800 text-sm mb-3 border-b border-gray-200 pb-2">${g.name}</h5>` : ''}
+                        <div class="flex flex-col gap-2">
+                            ${g.infos.map(info => `
+                                <div class="flex items-start gap-2 text-sm">
+                                    <span class="font-bold text-gray-600 w-1/3 min-w-[80px] break-words">${info.key}</span>
+                                    <span class="text-gray-400 font-bold">:</span>
+                                    <span class="text-gray-800 flex-1 break-words">${info.val}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
             
             const images = (prod.images && prod.images.length > 0) ? prod.images : [prod.image_url];
             
@@ -1769,6 +2001,16 @@ const dict = {
                     supaClient.from('banners').select('*'),
                     supaClient.from('orders').select('*')
                 ]);
+                let rRes = { data: [] };
+                let commRes = { data: [] };
+                try {
+                    const tempR = await supaClient.from('ratings').select('*');
+                    if (tempR && tempR.data) rRes = tempR;
+                } catch(e) {}
+                try {
+                    const tempC = await supaClient.from('comments').select('*');
+                    if (tempC && tempC.data) commRes = tempC;
+                } catch(e) {}
                 productsData = pRes.data || [];
                 productsData = productsData.map(p => {
                     let tagStr = p.tags || '';
@@ -1783,6 +2025,8 @@ const dict = {
                 categoriesData = cRes.data || [];
                 bannersData = bRes.data || [];
                 ordersData = oRes.data || [];
+                ratingsData = (rRes && rRes.data) || [];
+                commentsData = (commRes && commRes.data) || [];
                 ordersData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
                 renderHero();
@@ -2370,5 +2614,19 @@ const dict = {
             }
         })();
     </script>
+
+    
+
+    <!-- RATING MODAL -->
+    <div id="ratingModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm" onclick="if(event.target===this) this.classList.replace('flex','hidden')">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-xs relative shadow-2xl">
+            <button onclick="document.getElementById('ratingModal').classList.replace('flex','hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="ph-bold ph-x text-lg"></i></button>
+            <h3 class="text-xl font-black text-gray-900 mb-1 text-center" id="rm_title">Rate Product</h3>
+            <p class="text-sm text-gray-500 mb-6 text-center" id="rm_desc">Tap a star to select.</p>
+            <div class="flex items-center justify-center gap-2 mb-6" id="ratingModalStars"></div>
+            <button onclick="submitRating()" class="hidden w-full bg-green-500 hover:bg-green-600 text-black font-black py-3 rounded-xl transition-colors shadow-lg shadow-green-500/30" id="rm_submit_btn">Apply Rating</button>
+        </div>
+    </div>
+<div class="hidden bg-yellow-500 hover:bg-yellow-600 text-white shadow-md shadow-yellow-500/20"></div>
 </body>
 </html>
