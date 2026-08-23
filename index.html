@@ -78,7 +78,8 @@
 
             <div class="flex-1 max-w-2xl">
                 <div class="relative group">
-                    <input type="text" id="searchInput" aria-label="Search products" placeholder="Search products..." class="w-full bg-gray-100 rounded-full py-2.5 px-5 ps-12 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-transparent focus:border-primary/30 focus:bg-white" oninput="handleSearch()">
+                    <input type="text" id="searchInput" aria-label="Search products" placeholder="Search products..." class="w-full bg-gray-100 rounded-full py-2.5 px-5 ps-12 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-transparent focus:border-primary/30 focus:bg-white" oninput="handleSearchDropdown()" onkeydown="handleSearchKey(event)" onblur="setTimeout(() => { const d = document.getElementById('searchDropdown'); if(d) d.classList.add('hidden'); }, 200)">
+                    <div id="searchDropdown" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hidden z-50 max-h-96 overflow-y-auto"></div>
                     <i class="ph ph-magnifying-glass absolute start-4 top-1/2 -translate-y-1/2 text-gray-600 text-lg group-focus-within:text-primary transition-colors"></i>
                 </div>
             </div>
@@ -109,7 +110,7 @@
             
             <!-- HERO BANNERS -->
             <section class="p-4 w-full max-w-full relative group">
-                <div class="relative w-full h-[180px] md:h-[400px] lg:h-[500px] xl:h-[600px] rounded-2xl md:rounded-3xl overflow-hidden shadow-sm bg-gray-100 flex items-center justify-center" id="heroContainer">
+                <div class="relative w-full h-[180px] md:h-[400px] lg:h-[450px] xl:h-[500px] rounded-2xl md:rounded-3xl overflow-hidden shadow-sm bg-gray-100 flex items-center justify-center" id="heroContainer">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
                 <!-- Banner Dots -->
@@ -193,6 +194,35 @@
     </div>
 
     <!-- CHECKOUT MODAL -->
+
+    <div id="searchViewModal" class="fixed inset-0 bg-gray-50 z-[90] hidden opacity-0 transition-opacity duration-300 flex-col overflow-hidden">
+        <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-100 px-4 py-3 flex items-center gap-3 shadow-sm">
+            <button onclick="closeSearchView()" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors shrink-0" aria-label="Back"><i class="ph-bold ph-arrow-left rtl:rotate-180"></i></button>
+            <div class="flex-1 max-w-2xl mx-auto w-full">
+                <div class="relative group">
+                    <input type="text" id="sv_searchInput" aria-label="Search products" class="w-full bg-gray-100 rounded-full py-2 px-5 ps-11 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-transparent focus:border-primary/30 focus:bg-white" oninput="renderSearchView()" onkeydown="if(event.key==='Enter') { renderSearchView(); event.target.blur(); }">
+                    <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors rtl:right-4 rtl:left-auto"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="px-4 py-3 flex flex-col gap-3 shrink-0 bg-white border-b border-gray-100 shadow-sm z-30">
+            <div class="flex items-center gap-2 md:gap-3 w-full">
+                <button class="w-12 h-12 shrink-0 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-500 border border-gray-200 hover:border-red-100 rounded-xl flex items-center justify-center transition-colors shadow-sm" onclick="resetSearchFilters()" id="sv_btn_reset_filters" aria-label="Reset Filters">
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
+                </button>
+                <button class="flex-1 bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 rounded-xl flex justify-center items-center gap-2 font-bold text-sm text-gray-700 transition-colors shadow-sm" onclick="openFilterSortMenu('sort')">
+                    <i class="ph-bold ph-sort-ascending text-lg"></i> <span id="sv_txt_sort">Sort by</span>
+                </button>
+                <button class="flex-1 bg-gray-50 border border-gray-200 hover:bg-gray-100 p-3 rounded-xl flex justify-center items-center gap-2 font-bold text-sm text-gray-700 transition-colors shadow-sm" onclick="openFilterSortMenu('filter')">
+                    <i class="ph-bold ph-faders text-lg"></i> <span id="sv_txt_filter">Filter price</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5 overflow-y-auto flex-1 pb-safe content-start bg-gray-50" id="searchViewContainer"></div>
+    </div>
+
     <div id="checkoutModal" class="fixed inset-0 bg-black/60 z-[70] hidden opacity-0 transition-opacity duration-300 flex flex-col items-center p-4 overflow-y-auto backdrop-blur-sm">
         <div class="bg-white rounded-3xl w-full max-w-md p-6 md:p-8 transform scale-95 transition-transform duration-300 my-auto" id="checkoutModalContent">
             <div class="flex justify-between items-center mb-6">
@@ -837,7 +867,7 @@ const dict = {
             const container = document.getElementById('productsContainer');
             let data = currentFilter ? productsData.filter(p => p.category_id === currentFilter) : productsData;
             
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const searchTerm = ''; // Search input is now decoupled from homepage grid
             if(searchTerm) {
                 data = data.filter(p => p.title.toLowerCase().includes(searchTerm) || (p.tags && p.tags.toLowerCase().includes(searchTerm)));
             }
@@ -890,7 +920,157 @@ const dict = {
             container.innerHTML = htmlContent;
         };
         
-        const handleSearch = () => renderProducts();
+        
+        const handleSearchDropdown = () => {
+            const input = document.getElementById('searchInput');
+            if(!input) return;
+            const term = input.value.toLowerCase().trim();
+            const dropdown = document.getElementById('searchDropdown');
+            if(!dropdown) return;
+            
+            if (!term) {
+                dropdown.classList.add('hidden');
+                renderProducts(); // Also restore home page to default
+                return;
+            }
+            
+            let data = productsData.filter(p => p.title.toLowerCase().includes(term) || (p.tags && p.tags.toLowerCase().includes(term))).slice(0, 7);
+            if (data.length === 0) {
+                dropdown.innerHTML = `<div class="p-4 text-center text-gray-500 text-sm">${isArabic ? 'لا توجد نتائج' : 'No results found'}</div>`;
+            } else {
+                dropdown.innerHTML = data.map(p => {
+                    const img = (p.images && p.images.length > 0) ? p.images[0] : p.image_url;
+                    return `
+                    <div class="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0" onmousedown="openProductModal('${p.id}'); document.getElementById('searchInput').value=''; document.getElementById('searchDropdown').classList.add('hidden'); renderProducts();">
+                        <img src="${img}" class="w-10 h-10 object-cover rounded-lg" alt="${p.title}">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-gray-800 line-clamp-1">${p.title}</span>
+                            <span class="text-xs text-primary font-bold">${formatIQD(p.price)}</span>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+            dropdown.classList.remove('hidden');
+        };
+
+        const handleSearchKey = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const input = document.getElementById('searchInput');
+                const term = input.value.toLowerCase().trim();
+                if (term) {
+                    const dropdown = document.getElementById('searchDropdown');
+                    if(dropdown) dropdown.classList.add('hidden');
+                    openSearchView(term);
+                }
+            }
+        };
+
+        const openSearchView = (term, skipHistory = false) => {
+            const svInput = document.getElementById('sv_searchInput');
+            if(svInput && term) svInput.value = term;
+            
+            if(document.getElementById('sv_txt_sort')) document.getElementById('sv_txt_sort').textContent = isArabic ? 'ترتيب حسب' : 'Sort by';
+            if(document.getElementById('sv_txt_filter')) document.getElementById('sv_txt_filter').textContent = isArabic ? 'تصفية السعر' : 'Filter price';
+
+            renderSearchView();
+            
+            const modal = document.getElementById('searchViewModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            document.body.style.overflow = 'hidden';
+
+            if (!skipHistory) {
+                const url = new URL(window.location);
+                url.searchParams.set('q', term);
+                window.history.pushState({ q: term }, '', url);
+            }
+        };
+
+        const renderSearchView = () => {
+            const container = document.getElementById('searchViewContainer');
+            if(!container) return;
+            
+            const svInput = document.getElementById('sv_searchInput');
+            const term = svInput ? svInput.value.toLowerCase().trim() : '';
+            
+            const sortVal = currentSearchSort;
+            const minPrice = currentSearchMin;
+            const maxPrice = currentSearchMax;
+            
+            let data = productsData;
+            
+            if (term) {
+                data = data.filter(p => p.title.toLowerCase().includes(term) || (p.tags && p.tags.toLowerCase().includes(term)));
+            }
+            
+            if (!isNaN(minPrice)) {
+                data = data.filter(p => p.price >= minPrice);
+            }
+            if (!isNaN(maxPrice)) {
+                data = data.filter(p => p.price <= maxPrice);
+            }
+            
+            if (sortVal === 'asc') {
+                data = [...data].sort((a, b) => a.price - b.price);
+            } else if (sortVal === 'desc') {
+                data = [...data].sort((a, b) => b.price - a.price);
+            }
+            
+            if (data.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-600">${isArabic ? 'لا توجد نتائج' : 'No results found'}</div>`;
+            } else {
+                container.innerHTML = data.map(p => {
+                    const img = (p.images && p.images.length > 0) ? p.images[0] : p.image_url;
+                    return `
+                    <div class="bg-white rounded-2xl p-3 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 flex flex-col h-full" onclick="openProductModal('${p.id}')">
+                        <div class="relative w-full aspect-square rounded-xl bg-[#F7F7F7] mb-3 overflow-hidden">
+                            ${p.discount_pct ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg z-10">${isArabic ? 'خصم ' + p.discount_pct + '%' : '-' + p.discount_pct + '%'}</div>` : ''}
+                            <img src="${img}" alt="${p.title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="flex flex-col flex-1 justify-between">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-xs md:text-sm mb-1 line-clamp-2 leading-snug">${p.title}</h3>
+                            </div>
+                            <div class="mt-2 flex items-end justify-between">
+                                ${p.discount_pct ? `<span class="text-xs text-gray-600 line-through mr-1">${formatIQD(p.original_price)}</span> <span class="text-primary font-black text-sm md:text-lg">${formatIQD(p.price)}</span>` : `<span class="text-primary font-black text-sm md:text-lg">${formatIQD(p.price)}</span>`}
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            }
+            
+            if(term) {
+                const url = new URL(window.location);
+                if (url.searchParams.get('q') !== term) {
+                    url.searchParams.set('q', term);
+                    window.history.replaceState({ q: term }, '', url);
+                }
+            }
+        };
+
+        const closeSearchView = (skipHistory = false) => {
+            const modal = document.getElementById('searchViewModal');
+            if(!modal) return;
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
+
+            if (!skipHistory) {
+                const url = new URL(window.location);
+                url.searchParams.delete('q');
+                window.history.pushState({}, '', url);
+            }
+        };
+
+        // Old handleSearch override
+        const handleSearch = () => {}; 
+
 
         const openProductModal = (id, skipHistory = false) => {
             if (!skipHistory) {
@@ -1855,6 +2035,9 @@ const dict = {
         
         
         let currentCatSort = null; // 'asc', 'desc'
+        let currentSearchMin = 0;
+        let currentSearchMax = 5000000;
+        let currentSearchSort = 'default';
         let currentCatMin = 0;
         let currentCatMax = 5000000;
         let activeCategoryId = null;
@@ -1885,28 +2068,46 @@ const dict = {
         const openSortMenu = () => document.getElementById('sortMenuModal').classList.remove('hidden');
         const closeSortMenu = () => document.getElementById('sortMenuModal').classList.add('hidden');
         
-        const applyCategorySort = (sortType) => {
-            currentCatSort = sortType;
-            closeSortMenu();
-            if(activeCategoryId) renderCategoryViewProducts(activeCategoryId);
+        const openFilterSortMenu = (type) => {
+            const isSearch = document.getElementById('searchViewModal').classList.contains('flex');
+            if (type === 'sort') {
+                openSortMenu();
+            } else if (type === 'filter') {
+                const min = isSearch ? currentSearchMin : currentCatMin;
+                const max = isSearch ? currentSearchMax : currentCatMax;
+                document.getElementById('filter_min').value = min;
+                document.getElementById('filter_max').value = max;
+                document.getElementById('input_min').value = formatNumberWithCommas(min);
+                document.getElementById('input_max').value = formatNumberWithCommas(max);
+                document.getElementById('filterMenuModal').classList.remove('hidden');
+            }
         };
 
-        const openFilterMenu = () => {
-            document.getElementById('filter_min').value = currentCatMin;
-            document.getElementById('filter_max').value = currentCatMax;
-            document.getElementById('input_min').value = formatNumberWithCommas(currentCatMin);
-            document.getElementById('input_max').value = formatNumberWithCommas(currentCatMax);
-            document.getElementById('filterMenuModal').classList.remove('hidden');
+        const applyCategorySort = (sortType) => {
+            const isSearch = document.getElementById('searchViewModal').classList.contains('flex');
+            if (isSearch) {
+                currentSearchSort = sortType;
+                closeSortMenu();
+                renderSearchView();
+            } else {
+                currentCatSort = sortType;
+                closeSortMenu();
+                if(activeCategoryId) renderCategoryViewProducts(activeCategoryId);
+            }
         };
+
+        const openFilterMenu = () => openFilterSortMenu('filter');
         const closeFilterMenu = () => document.getElementById('filterMenuModal').classList.add('hidden');
 
         const updateFilterUI = (source) => {
             let min = parseInt(document.getElementById('filter_min').value) || 0;
             let max = parseInt(document.getElementById('filter_max').value) || 0;
+            
             if (min > max) {
                 if (source === 'min') { min = max; document.getElementById('filter_min').value = min; }
                 else { max = min; document.getElementById('filter_max').value = max; }
             }
+            
             document.getElementById('input_min').value = formatNumberWithCommas(min);
             document.getElementById('input_max').value = formatNumberWithCommas(max);
         };
@@ -1929,10 +2130,28 @@ const dict = {
         };
 
         const applyCategoryFilter = () => {
-            currentCatMin = parseNumberFromCommas(document.getElementById('input_min').value);
-            currentCatMax = parseNumberFromCommas(document.getElementById('input_max').value);
-            closeFilterMenu();
-            if(activeCategoryId) renderCategoryViewProducts(activeCategoryId);
+            const min = parseNumberFromCommas(document.getElementById('input_min').value);
+            const max = parseNumberFromCommas(document.getElementById('input_max').value);
+            const isSearch = document.getElementById('searchViewModal').classList.contains('flex');
+            
+            if (isSearch) {
+                currentSearchMin = min;
+                currentSearchMax = max;
+                closeFilterMenu();
+                renderSearchView();
+            } else {
+                currentCatMin = min;
+                currentCatMax = max;
+                closeFilterMenu();
+                if(activeCategoryId) renderCategoryViewProducts(activeCategoryId);
+            }
+        };
+
+        const resetSearchFilters = () => {
+            currentSearchMin = 0;
+            currentSearchMax = 5000000;
+            currentSearchSort = 'default';
+            renderSearchView();
         };
 
         // --- Settings & Dark Mode Logic ---
