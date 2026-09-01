@@ -62,13 +62,21 @@
         [id^="dot-"] { position: relative; }
         [id^="dot-"]::after { content: ''; position: absolute; top: -12px; right: -12px; bottom: -12px; left: -12px; cursor: pointer; }
     </style>
+
+
+
+
+
+
+
 </head>
 <body class="text-gray-900 transition-colors duration-300">
 
     <div id="app-container" class="min-h-screen flex flex-col  w-full  bg-white relative">
         
         <!-- HEADER -->
-        <header class="sticky top-0 z-40 glass border-b border-gray-100 px-4 py-3 flex items-center justify-between gap-3 md:gap-6">
+        <div id="storeWrapper">
+<header class="sticky top-0 z-40 glass border-b border-gray-100 px-4 py-3 flex items-center justify-between gap-3 md:gap-6">
             <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="goHome()">
                 <div id="headerLogoContainer" class="flex items-center justify-center overflow-hidden w-12 h-12 md:w-14 md:h-14 shrink-0 hover:scale-105 transition-transform">
                     <img src="https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-light-modified-512.png" alt="IQ Mart Logo" width="512" height="512" class="w-full h-full object-contain drop-shadow-md">
@@ -102,6 +110,10 @@
                     <i class="ph ph-shopping-cart text-2xl text-gray-700"></i>
                     <span id="cartCount" class="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full scale-0 transition-transform shadow-sm">0</span>
                 </div>
+                <div class="cursor-pointer hover:bg-gray-100 p-2 rounded-xl transition-colors hidden md:flex items-center gap-2 ml-2 rtl:mr-2 rtl:ml-0" onclick="window.navigateToAuth('signup')">
+                    <i class="ph-bold ph-user text-2xl text-gray-700"></i>
+                    <span id="desktopAuthText" class="font-bold text-sm text-gray-700">حسابي</span>
+                </div>
             </div>
         </header>
 
@@ -120,7 +132,17 @@
             <!-- CATEGORIES -->
             <section class="pt-2 pb-6 px-4">
                 <h2 class="text-lg md:text-xl font-bold mb-4" id="catTitle">Categories</h2>
-                <div class="flex overflow-x-auto no-scrollbar gap-4 md:gap-6 snap-x" id="categoriesContainer"></div>
+                <div class="relative">
+                    <button id="cat_scroll_left" onclick="scrollCategories(-1)" class="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg items-center justify-center text-gray-800 z-10 transition-opacity pointer-events-auto -ml-3 hidden" aria-label="Scroll Left" style="display: none;">
+                        <i class="ph-bold ph-caret-left"></i>
+                    </button>
+                    
+                    <div class="flex overflow-x-auto no-scrollbar gap-4 md:gap-6 snap-x scroll-smooth" id="categoriesContainer" onscroll="updateCategoryScrollButtons()"></div>
+                    
+                    <button id="cat_scroll_right" onclick="scrollCategories(1)" class="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-lg items-center justify-center text-gray-800 z-10 transition-opacity pointer-events-auto -mr-3 hidden" aria-label="Scroll Right" style="display: none;">
+                        <i class="ph-bold ph-caret-right"></i>
+                    </button>
+                </div>
             </section>
 
             <!-- PRODUCTS GRID -->
@@ -154,6 +176,10 @@
                 <i class="ph-fill ph-heart text-2xl"></i>
                 <span class="text-[10px] font-semibold mt-1" id="navFav">Saved</span>
             </div>
+            <div class="flex flex-col items-center text-gray-600 hover:text-primary cursor-pointer transition-colors w-full py-1" onclick="window.navigateToAuth('signup')">
+                <i class="ph-fill ph-user text-2xl"></i>
+                <span class="text-[10px] font-semibold mt-1" id="navAccount">Account</span>
+            </div>
             <div class="flex flex-col items-center text-gray-600 hover:text-primary cursor-pointer transition-colors w-full py-1 relative" onclick="toggleCart()">
                 <div class="relative">
                     <i class="ph-fill ph-shopping-cart text-2xl"></i>
@@ -162,6 +188,7 @@
                 <span class="text-[10px] font-semibold mt-1" id="navCart">Cart</span>
             </div>
         </nav>
+</div>
 
         <!-- ADMIN DASHBOARD (#api/users/admin) -->
         
@@ -310,12 +337,14 @@
                             <i class="ph-bold ph-shopping-cart-simple"></i> <span id="pm_add_text">Add to Cart</span>
                         </button>
                     </div>
+                    <button id="pm_open_comments_btn" onclick="openCommentsModal()" class="w-full mt-3 bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-colors shadow-sm">
+                        <i class="ph-bold ph-chat-circle-text text-xl"></i> <span id="pm_comments_btn_text">Comments</span>
+                    </button>
                     
                     <!-- Related Products (AOV) -->
                     <div id="pm_related_products" class="w-full mt-8 hidden border-t border-gray-100 pt-6"></div>
                     
-                    <!-- Comments Section -->
-                    <div id="pm_comments_section" class="w-full mt-2"></div>
+                    
                     
                 </div>
             </div>
@@ -476,11 +505,7 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-xl transform -translate-y-20 opacity-0 transition-all duration-300 z-[100] flex items-center gap-3 text-sm font-medium pointer-events-none">
-        <i class="ph-fill ph-check-circle text-green-400 text-xl"></i>
-        <span id="toastMsg">Success</span>
-    </div>
+    
 
     <script>
         // ==========================================
@@ -519,6 +544,214 @@
         };
 
         let isArabic = localStorage.getItem('lang') === 'ar';
+        window.isArabic = isArabic;
+        let currentUser = null;
+
+        supaClient.auth.onAuthStateChange((_event, session) => {
+            currentUser = session ? session.user : null;
+            updateAuthUI(); checkBans();
+            if (_event === 'SIGNED_OUT') {
+                localStorage.removeItem('myOrderIds');
+                myOrderIds = [];
+                ordersData = [];
+            }
+            if (_event === 'SIGNED_IN' || _event === 'SIGNED_OUT') {
+                fetchStoreData();
+            }
+        });
+
+        
+        
+        window.togglePass = (id, btn) => {
+            const inp = document.getElementById(id);
+            const open = btn.querySelector('.eye-open');
+            const closed = btn.querySelector('.eye-closed');
+            if(inp.type === 'password') {
+                inp.type = 'text';
+                open.classList.add('hidden');
+                closed.classList.remove('hidden');
+            } else {
+                inp.type = 'password';
+                open.classList.remove('hidden');
+                closed.classList.add('hidden');
+            }
+        };
+
+        window.switchAuthTab = (tab) => {
+            const tLogin = document.getElementById('tab_login');
+            const tSignup = document.getElementById('tab_signup');
+            const fLogin = document.getElementById('form_login');
+            const fSignup = document.getElementById('form_signup');
+            
+            const activeClass = ['bg-white', 'shadow-sm'];
+            const inactiveClass = ['text-gray-500', 'hover:text-gray-800'];
+            
+            if (tab === 'login') {
+                tLogin.classList.remove(...inactiveClass);
+                tLogin.classList.add(...activeClass);
+                tLogin.style.color = 'var(--color-primary, #dc2626)';
+                
+                tSignup.classList.remove(...activeClass);
+                tSignup.classList.add(...inactiveClass);
+                tSignup.style.color = '';
+                
+                if(fLogin) fLogin.classList.replace('hidden', 'block');
+                if(fSignup) fSignup.classList.replace('block', 'hidden');
+                window.history.replaceState(null, '', '#signin');
+            } else {
+                tSignup.classList.remove(...inactiveClass);
+                tSignup.classList.add(...activeClass);
+                tSignup.style.color = 'var(--color-primary, #dc2626)';
+                
+                tLogin.classList.remove(...activeClass);
+                tLogin.classList.add(...inactiveClass);
+                tLogin.style.color = '';
+                
+                if(fSignup) fSignup.classList.replace('hidden', 'block');
+                if(fLogin) fLogin.classList.replace('block', 'hidden');
+                window.history.replaceState(null, '', '#signup');
+            }
+        };
+
+                window.submitSignup = async () => {
+            const username = document.getElementById('regUsername').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            if(!username || !phone || !password) return showToast(window.isArabic ? 'يرجى إدخال جميع الحقول' : 'Please fill all fields', true);
+
+            const btn = document.getElementById('btn_submit_signup');
+            const ogHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-xl"></i>';
+            btn.disabled = true;
+
+            const generatedEmail = `${phone}@iqmart.local`;
+
+            const { data, error } = await supaClient.auth.signUp({
+                email: generatedEmail,
+                password: password,
+                options: { data: { username: username, phone: phone } }
+            });
+
+            if (error) {
+                showToast(error.message, true);
+                btn.innerHTML = ogHtml;
+                btn.disabled = false;
+                return;
+            }
+
+            // Save to public profiles mapping table
+            await supaClient.from('user_profiles').insert([{ 
+                user_id: data.user.id, 
+                username: username, 
+                phone: phone, 
+                auth_email: generatedEmail 
+            }]);
+
+            showToast(window.isArabic ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully');
+            btn.innerHTML = ogHtml;
+            btn.disabled = false;
+            window.location.hash = ''; 
+        };
+
+        window.submitSignin = async () => {
+            const identifier = document.getElementById('loginIdentifier').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if(!identifier || !password) return showToast(window.isArabic ? 'يرجى إدخال جميع الحقول' : 'Please fill all fields', true);
+
+            const btn = document.getElementById('btn_submit_signin');
+            const ogHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-xl"></i>';
+            btn.disabled = true;
+
+            let authEmail = `${identifier}@iqmart.local`; // Fallback assumption
+
+            // Lookup real email via the user_profiles map
+            const { data: profile } = await supaClient.from('user_profiles')
+                .select('auth_email')
+                .or(`username.eq.${identifier},phone.eq.${identifier}`)
+                .maybeSingle();
+
+            if (profile && profile.auth_email) {
+                authEmail = profile.auth_email;
+            }
+
+            const { error } = await supaClient.auth.signInWithPassword({ email: authEmail, password });
+            
+            btn.innerHTML = ogHtml;
+            btn.disabled = false;
+
+            if (error) return showToast(window.isArabic ? 'بيانات الدخول غير صحيحة' : 'Invalid credentials', true);
+
+            showToast(window.isArabic ? 'تم تسجيل الدخول' : 'Logged in');
+            window.location.hash = ''; 
+        };
+
+        
+        window.checkBans = () => {
+            if (!currentUser) return;
+            const bans = currentUser.user_metadata?.bans || {};
+            if (bans.full) {
+                let banScreen = document.getElementById('banned-screen-overlay');
+                if (!banScreen) {
+                    banScreen = document.createElement('div');
+                    banScreen.id = 'banned-screen-overlay';
+                    banScreen.className = 'flex flex-col items-center justify-center text-white px-4 text-center';
+                    banScreen.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: #111827; z-index: 2147483647 !important;';
+
+                    banScreen.innerHTML = `
+                        <i class="ph-fill ph-warning-circle text-red-500 text-6xl mb-4"></i>
+                        <h1 class="text-3xl font-bold mb-2">${window.isArabic ? 'تم حظر حسابك' : 'Your account is banned'}</h1>
+                        <p class="text-gray-400 mb-6">${window.isArabic ? 'نعتذر، ولكن تم حظر هذا الحساب من استخدام المنصة.' : 'Sorry, but this account has been banned from using the platform.'}</p>
+                        <button onclick="window.handleLogout ? window.handleLogout() : (async () => { await supaClient.auth.signOut(); window.location.href = '/'; })()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-xl transition-colors">${window.isArabic ? 'تسجيل الخروج' : 'Log Out'}</button>
+                    `;
+                    document.body.appendChild(banScreen);
+                }
+                document.body.style.overflow = 'hidden';
+            } else {
+                const banScreen = document.getElementById('banned-screen-overlay');
+                if (banScreen) {
+                    banScreen.remove();
+                    document.body.style.overflow = '';
+                }
+            }
+        };
+
+        setInterval(async () => {
+            if (!currentUser) return;
+            try {
+                const { data } = await supaClient.auth.getUser();
+                if (data && data.user) {
+                    currentUser = data.user;
+                    checkBans();
+                }
+            } catch(e) {}
+        }, 3000);
+
+        window.updateAuthUI = () => {
+            const dBtn = document.getElementById('desktopAuthText');
+            const mBtn = document.getElementById('navAccount');
+            const btnDesktopParent = dBtn ? dBtn.parentElement : null;
+            const mBtnParent = mBtn ? mBtn.parentElement : null;
+            
+            const txt = window.isArabic 
+                ? (currentUser ? 'حسابي' : 'تسجيل / إنشاء حساب') 
+                : (currentUser ? 'Account' : 'Log in / Sign up');
+            if(dBtn) dBtn.textContent = txt;
+            if(mBtn) mBtn.textContent = txt;
+            
+            // Always navigate to account page regardless of auth state
+            if(btnDesktopParent) btnDesktopParent.onclick = window.navigateToAuth;
+            if(mBtnParent) mBtnParent.onclick = window.navigateToAuth;
+        };
+
+        window.handleLogout = async () => {
+            await supaClient.auth.signOut();
+            showToast(window.isArabic ? 'تم تسجيل الخروج' : 'Logged out');
+            closeAuthModal();
+        };
+
         let cart = [];
         let commentsData = [];
         let ratingsData = [];
@@ -669,84 +902,228 @@ const dict = {
         };
         const formatIQD = (num) => new Intl.NumberFormat('en-US').format(num) + ' IQD';
 
-        const renderComments = (productId) => {
-            const container = document.getElementById('pm_comments_section');
-            if (!container) return;
+        let currentCommentProductId = null;
+        
+        window.openCommentsModal = () => {
+            const modal = document.getElementById('commentsModal');
+            const content = document.getElementById('commentsModalContent');
+            const cmTitle = document.getElementById('cm_title');
+            const cmText = document.getElementById('cm_text');
+            const cmBtn = document.getElementById('pm_comments_btn_text');
             
-            const prodComments = commentsData.filter(c => c.product_id === productId).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            cmTitle.textContent = window.isArabic ? 'التعليقات' : 'Comments';
+            cmText.placeholder = window.isArabic ? 'أضف تعليقك...' : 'Write a comment...';
+            if(cmBtn) cmBtn.textContent = window.isArabic ? 'التعليقات' : 'Comments';
             
-            let html = `
-                <div class="border-t border-gray-100 pt-8 mt-4">
-                    <h3 class="font-black text-xl text-gray-900 mb-4">${isArabic ? 'التعليقات' : 'Comments'}</h3>
-                    
-                    <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100 shadow-sm">
-                        <div class="flex flex-col gap-3">
-                            <input type="text" id="commentName" placeholder="${isArabic ? 'الاسم...' : 'Your Name...'}" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 font-medium">
-                            <textarea id="commentText" rows="3" placeholder="${isArabic ? 'أضف تعليقك...' : 'Write a comment...'}" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 resize-none"></textarea>
-                            <button onclick="submitComment('${productId}')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-md shadow-yellow-500/20 text-sm self-end" style="background-color: #eab308 !important; color: white !important;">${isArabic ? 'نشر التعليق' : 'Post Comment'}</button>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col gap-4">
-            `;
+            modal.classList.remove('hidden');
+            // trigger reflow
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modal.classList.add('opacity-100');
+            content.classList.remove('translate-y-full');
+            content.classList.add('translate-y-0');
             
-            if (prodComments.length === 0) {
-                html += `<p class="text-sm text-gray-500 text-center py-6 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">${isArabic ? 'لا توجد تعليقات بعد. كن أول من يعلق!' : 'No comments yet. Be the first to comment!'}</p>`;
+            currentCommentProductId = document.getElementById('pm_id').textContent;
+            renderComments();
+            
+            // Setup submit button
+            const subBtn = document.getElementById('cm_submit');
+            subBtn.onclick = () => submitComment();
+            
+            // Check login status
+            const req = document.getElementById('cm_login_req');
+            const inputArea = document.getElementById('cm_input_area');
+            if (currentUser) {
+                req.classList.add('hidden');
+                inputArea.classList.remove('hidden');
+                inputArea.style.display = 'flex';
             } else {
-                prodComments.forEach(c => {
-                    const nameStr = c.author_name || 'Anonymous';
-                    const initial = nameStr.charAt(0).toUpperCase();
-                    const colors = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500'];
-                    const color = colors[nameStr.length % colors.length];
-                    
-                    html += `
-                        <div class="flex gap-3">
-                            <div class="w-10 h-10 rounded-full ${color} text-white flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-sm">
-                                ${initial}
-                            </div>
-                            <div class="flex flex-col bg-gray-50 rounded-2xl p-4 flex-1 border border-gray-100 shadow-sm">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-black text-sm text-gray-900">${nameStr}</span>
-                                    <span class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">${new Date(c.created_at).toLocaleDateString()}</span>
-                                </div>
-                                <span class="text-sm text-gray-700 leading-relaxed">${c.content}</span>
-                            </div>
-                        </div>
-                    `;
-                });
+                req.classList.remove('hidden');
+                req.textContent = window.isArabic ? 'يجب تسجيل الدخول لإضافة تعليق.' : 'You must be logged in to comment.';
+                inputArea.classList.add('hidden');
+                inputArea.style.display = 'none';
             }
-            
-            html += `</div></div>`;
-            container.innerHTML = html;
         };
 
-        window.submitComment = async (productId) => {
-            const nameEl = document.getElementById('commentName');
-            const textEl = document.getElementById('commentText');
-            const author_name = nameEl.value.trim();
+        window.closeCommentsModal = () => {
+            const modal = document.getElementById('commentsModal');
+            const content = document.getElementById('commentsModalContent');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            content.classList.remove('translate-y-0');
+            content.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                currentCommentProductId = null;
+            }, 300);
+        };
+        
+        
+
+        const renderComments = () => {
+            const container = document.getElementById('cm_list');
+            if (!container || !currentCommentProductId) return;
+            
+            const prodComments = commentsData.filter(c => c.product_id === currentCommentProductId && !c.content.startsWith('[DELETED-COMMENT]')).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            
+            let currentUserAuthorName = null;
+            if (currentUser && currentUser.user_metadata) {
+                const meta = currentUser.user_metadata;
+                const un = meta.username || 'user';
+                const nick = meta.nickname || un;
+                currentUserAuthorName = `${nick} (@${un})`;
+            }
+            
+            let html = '';
+            if (prodComments.length === 0) {
+                html = `<div class="flex-1 flex flex-col items-center justify-center text-gray-400 py-10">
+                    <i class="ph-bold ph-chat-teardrop text-4xl mb-2"></i>
+                    <p class="text-sm">${window.isArabic ? 'لا توجد تعليقات بعد. كن أول من يعلق!' : 'No comments yet. Be the first!'}</p>
+                </div>`;
+            } else {
+                prodComments.forEach(c => {
+                    const date = new Date(c.created_at).toLocaleDateString(window.isArabic ? 'ar-IQ' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    
+                    // Parse author_name to extract nickname and username if available
+                    let displayName = c.author_name;
+                    let usernameHtml = '';
+                    
+                    const userMatch = displayName.match(/^(.*?) \(@(.*?)\)$/);
+                    if (userMatch) {
+                        displayName = userMatch[1];
+                        usernameHtml = `<span class="block text-xs text-gray-400 font-medium mt-0.5">@${userMatch[2]}</span>`;
+                    }
+                    
+                    const initial = displayName.charAt(0).toUpperCase();
+                    const likesCount = c.likes || 0;
+                    
+                    html += `
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm animate-fade-in flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0">
+                            ${initial}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start mb-1">
+                                <div>
+                                    <h4 class="font-bold text-sm text-gray-900">${displayName}</h4>
+                                    ${usernameHtml}
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-400 font-medium">${date}</span>
+                                    ${currentUserAuthorName === c.author_name ? `
+                                    <div class="relative">
+                                        <button onfocus="document.getElementById('c_menu_${c.id}').classList.remove('hidden')" onblur="setTimeout(() => { const el = document.getElementById('c_menu_${c.id}'); if(el) el.classList.add('hidden'); }, 200)" class="p-1 text-gray-400 hover:text-gray-700 transition-colors rounded-full hover:bg-gray-100 focus:outline-none">
+                                            <i class="ph-bold ph-dots-three text-lg"></i>
+                                        </button>
+                                        <div id="c_menu_${c.id}" class="absolute right-0 rtl:left-0 rtl:right-auto top-full mt-1 bg-white border border-gray-100 shadow-lg rounded-xl overflow-hidden hidden z-20 min-w-[120px]">
+                                            <button onclick="deleteComment('${c.id}')" class="w-full text-left rtl:text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold transition-colors flex items-center gap-2">
+                                                <i class="ph-bold ph-trash"></i> ${window.isArabic ? 'حذف' : 'Delete'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <p class="text-gray-700 text-sm mt-2 leading-relaxed break-words">${c.content}</p>
+                            
+                            
+                        </div>
+                    </div>`;
+                });
+            }
+            container.innerHTML = html;
+            // Scroll to bottom
+            setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+        };
+
+        
+        window.deleteComment = async (commentId) => {
+            if (!currentUser) return;
+            const cIndex = commentsData.findIndex(c => c.id === commentId);
+            
+            if (cIndex > -1) {
+                const meta = currentUser.user_metadata || {};
+                const un = meta.username || 'user';
+                const nick = meta.nickname || un;
+                const author_name = `${nick} (@${un})`;
+                
+                const lastTimeStr = localStorage.getItem('lastCommentTime_' + author_name);
+                if (lastTimeStr) {
+                    const secondsPassed = (Date.now() - parseInt(lastTimeStr)) / 1000;
+                    if (secondsPassed < 10 && secondsPassed >= 0) {
+                        const remaining = Math.ceil(10 - secondsPassed);
+                        showToast(window.isArabic ? `يجب الانتظار ${remaining} ثانية قبل الحذف.` : `10 seconds cooldown. Wait ${remaining}s.`, true);
+                        return;
+                    }
+                }
+            }
+            
+            let newContent = '[DELETED-COMMENT]';
+            if (cIndex > -1) {
+                newContent = '[DELETED-COMMENT] ' + commentsData[cIndex].content;
+                commentsData[cIndex].content = newContent;
+            }
+            renderComments();
+            
+            try {
+                await supaClient.from('comments').update({ content: newContent }).eq('id', commentId);
+            } catch(e) {
+                console.error('Error soft-deleting comment:', e);
+            }
+        };
+
+        window.submitComment = async () => {
+            if (!currentUser) return;
+            if (currentUser?.user_metadata?.bans?.commenting) {
+                showToast(window.isArabic ? 'حسابك محظور من التعليق.' : 'Your account is banned from commenting.', true);
+                return;
+            }
+            const textEl = document.getElementById('cm_text');
             const content = textEl.value.trim();
             
-            if (!author_name || !content) {
-                showToast(isArabic ? 'الرجاء إدخال الاسم والتعليق' : 'Please enter both name and comment', true);
+            if (!content) return;
+            
+            if (content.includes('[DELETED-COMMENT]')) {
+                showToast(window.isArabic ? 'هذا النص غير مسموح به.' : 'This text is not allowed.', true);
                 return;
             }
             
+            // Build author_name with nickname and username
+            const meta = currentUser.user_metadata || {};
+            const un = meta.username || 'user';
+            const nick = meta.nickname || un;
+            const author_name = `${nick} (@${un})`;
+            
+            const userCommentsCount = commentsData.filter(c => c.product_id === currentCommentProductId && c.author_name === author_name && !c.content.startsWith('[DELETED-COMMENT]')).length;
+            if (userCommentsCount >= 2) {
+                showToast(window.isArabic ? 'لقد وصلت إلى الحد الأقصى للتعليقات (2) لهذا المنتج.' : 'You have reached the maximum of 2 comments for this product.', true);
+                return;
+            }
+            
+            localStorage.setItem('lastCommentTime_' + author_name, Date.now());
+            
             const newComment = {
                 id: Date.now().toString(),
-                product_id: productId,
+                product_id: currentCommentProductId,
                 author_name,
                 content,
+                likes: 0,
                 created_at: new Date().toISOString()
             };
             
             commentsData.push(newComment);
-            renderComments(productId);
-            
-            showToast(isArabic ? 'تم نشر التعليق بنجاح!' : 'Comment posted successfully!');
+            renderComments();
+            textEl.value = '';
             
             try {
-                await supaClient.from('comments').insert([{ product_id: productId, author_name, content }]);
-            } catch(e) {}
+                await supaClient.from('comments').insert([{
+                    product_id: currentCommentProductId,
+                    author_name: author_name,
+                    content: content
+                }]);
+            } catch(e) {
+                console.error('Error saving comment to DB:', e);
+            }
         };
 
         const getProductRating = (productId) => {
@@ -790,14 +1167,27 @@ const dict = {
             document.getElementById('ratingModal').classList.replace('hidden', 'flex');
         };
 
+        window.updateNumericDisplay = (val) => {
+            const display = document.getElementById('rm_numeric_display');
+            if (display) {
+                if (val > 0) {
+                    display.textContent = isArabic ? `${val} من 5 نجوم` : `${val} out of 5 stars`;
+                    display.style.opacity = '1';
+                } else {
+                    display.style.opacity = '0';
+                }
+            }
+        };
+
         window.renderModalStars = () => {
             let html = '';
             for(let i=1; i<=5; i++) {
                 const isFilled = i <= selectedStars;
                 const starClass = isFilled ? 'text-yellow-400' : 'text-gray-300';
-                html += `<button id="rm_star_${i}" type="button" onmouseenter="window.setHover(${i})" onmouseleave="window.clearHover()" onclick="window.selectStar(${i})" class="text-5xl hover:scale-110 transition-transform ${starClass}"><i class="${isFilled ? 'ph-fill' : 'ph'} ph-star"></i></button>`;
+                html += `<button id="rm_star_${i}" type="button" onmouseenter="window.setHover(${i})" onmouseleave="window.clearHover()" onclick="window.selectStar(${i})" class="text-5xl hover:scale-110 transition-transform ${starClass}"><i id="rm_star_icon_${i}" class="${isFilled ? 'ph-fill' : 'ph'} ph-star"></i></button>`;
             }
             document.getElementById('ratingModalStars').innerHTML = html;
+            window.updateNumericDisplay(selectedStars);
         };
 
         window.setHover = (val) => { 
@@ -805,11 +1195,13 @@ const dict = {
             if(alreadyRated) return; // disable hover if already rated
             for(let i=1; i<=5; i++) {
                 const btn = document.getElementById(`rm_star_${i}`);
-                if(btn) {
+                const icon = document.getElementById(`rm_star_icon_${i}`);
+                if(btn && icon) {
                     btn.className = `text-5xl hover:scale-110 transition-transform ${i <= val ? 'text-yellow-400' : 'text-gray-300'}`;
-                    btn.innerHTML = `<i class="${i <= val ? 'ph-fill' : 'ph'} ph-star"></i>`;
+                    icon.className = `${i <= val ? 'ph-fill' : 'ph'} ph-star`;
                 }
             }
+            window.updateNumericDisplay(val);
         };
         
         window.clearHover = () => { 
@@ -817,11 +1209,13 @@ const dict = {
             if(alreadyRated) return;
             for(let i=1; i<=5; i++) {
                 const btn = document.getElementById(`rm_star_${i}`);
-                if(btn) {
+                const icon = document.getElementById(`rm_star_icon_${i}`);
+                if(btn && icon) {
                     btn.className = `text-5xl hover:scale-110 transition-transform ${i <= selectedStars ? 'text-yellow-400' : 'text-gray-300'}`;
-                    btn.innerHTML = `<i class="${i <= selectedStars ? 'ph-fill' : 'ph'} ph-star"></i>`;
+                    icon.className = `${i <= selectedStars ? 'ph-fill' : 'ph'} ph-star`;
                 }
             }
+            window.updateNumericDisplay(selectedStars);
         };
         
         window.selectStar = (val) => { 
@@ -999,10 +1393,57 @@ const dict = {
             });
         };
 
-        const renderCategories = () => {
+        
+        window.scrollCategories = (dir) => {
+            const container = document.getElementById('categoriesContainer');
+            if(!container) return;
+            const scrollAmount = container.clientWidth * 0.5 * dir;
+            container.scrollBy({ left: scrollAmount * (window.isArabic ? -1 : 1), behavior: 'smooth' });
+        };
+
+        window.updateCategoryScrollButtons = () => {
+            const container = document.getElementById('categoriesContainer');
+            const leftBtn = document.getElementById('cat_scroll_left');
+            const rightBtn = document.getElementById('cat_scroll_right');
+            if(!container || !leftBtn || !rightBtn) return;
+            
+            if (window.innerWidth < 768) {
+                leftBtn.style.display = 'none';
+                rightBtn.style.display = 'none';
+                return;
+            }
+            
+            const isOverflowing = container.scrollWidth > container.clientWidth + 2;
+            if (!isOverflowing) {
+                leftBtn.style.display = 'none';
+                rightBtn.style.display = 'none';
+                return;
+            }
+            
+            const sLeft = container.scrollLeft;
+            const sMax = container.scrollWidth - container.clientWidth;
+            const absLeft = Math.abs(sLeft);
+            
+            let isAtStart = absLeft <= 2;
+            let isAtEnd = absLeft >= sMax - 2;
+            
+            if (window.isArabic) {
+                leftBtn.style.display = isAtEnd ? 'none' : 'flex';
+                rightBtn.style.display = isAtStart ? 'none' : 'flex';
+            } else {
+                leftBtn.style.display = isAtStart ? 'none' : 'flex';
+                rightBtn.style.display = isAtEnd ? 'none' : 'flex';
+            }
+        };
+        
+        window.addEventListener('resize', updateCategoryScrollButtons);
+
+const renderCategories = () => {
             const container = document.getElementById('categoriesContainer');
             if(categoriesData.length === 0) {
                 container.innerHTML = '';
+            setTimeout(updateCategoryScrollButtons, 50);
+
                 return;
             }
             container.innerHTML = `
@@ -1278,7 +1719,7 @@ const dict = {
             if(!prod) return;
             
             document.getElementById('pm_id').textContent = prod.id;
-            renderComments(prod.id);
+            /* renderComments(prod.id); */
             document.getElementById('pm_title').textContent = prod.title;
             const r = getProductRating(prod.id);
             document.getElementById('pm_rating_container').innerHTML = `
@@ -1426,12 +1867,13 @@ const dict = {
         };
 
         const closeProductModal = (e, skipHistory = false) => {
+            if(e && e.target.id !== 'productModal') return;
+            
             if (!skipHistory) {
                 const url = new URL(window.location);
                 url.searchParams.delete('product');
                 window.history.pushState({}, '', url);
             }
-            if(e && e.target.id !== 'productModal') return;
             const modal = document.getElementById('productModal');
             modal.classList.add('opacity-0');
             setTimeout(() => {
@@ -1553,8 +1995,27 @@ const dict = {
         };
 
         const openCheckoutModal = () => {
+            if (currentUser?.user_metadata?.bans?.ordering) {
+                showToast(window.isArabic ? 'حسابك محظور من الطلب.' : 'Your account is banned from ordering.', true);
+                return;
+            }
+            if (!currentUser) {
+                showToast(window.isArabic ? 'يجب تسجيل الدخول لإتمام الطلب' : 'You must be logged in to checkout', true);
+                window.location.href = 'account/';
+                return;
+            }
             if(cart.length === 0) return;
             toggleCart();
+            
+            const meta = currentUser.user_metadata || {};
+            const coNameEl = document.getElementById('co_name');
+            const coPhoneEl = document.getElementById('co_phone');
+            if (coNameEl && !coNameEl.value) {
+                coNameEl.value = meta.nickname || meta.username || '';
+            }
+            if (coPhoneEl && !coPhoneEl.value) {
+                coPhoneEl.value = meta.phone || '';
+            }
             
             // Reset Promo
             window.activePromo = null;
@@ -1918,7 +2379,42 @@ const dict = {
 
         const applyLanguage = () => {
             
-            document.documentElement.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+            
+            
+            // AUTH PAGES TRANSLATIONS
+            const e = (id, en, ar, prop='textContent') => { const el = document.getElementById(id); if(el) el[prop] = isArabic ? ar : en; };
+            
+            e('auth_hero_title', 'Welcome back to your workspace.', 'مرحباً بعودتك إلى مساحتك.');
+            e('auth_hero_desc', 'Manage your account, keep your details safe, and pick up right where you left off.', 'قم بإدارة حسابك، حافظ على أمان بياناتك، واستكمل من حيث توقفت.');
+            e('txt_tab_login', 'Log in', 'تسجيل الدخول');
+            e('txt_tab_signup', 'Sign up', 'إنشاء حساب');
+            
+            e('li_heading', 'Log in', 'تسجيل الدخول');
+            e('li_sub', 'Enter your details to access your account.', 'أدخل تفاصيلك للوصول إلى حسابك.');
+            e('li_lbl_id', 'Username or phone number', 'اسم المستخدم أو رقم الهاتف');
+            e('loginIdentifier', 'username or phone', 'اسم المستخدم أو رقم الهاتف', 'placeholder');
+            e('li_lbl_pass', 'Password', 'كلمة المرور');
+            e('loginPassword', 'password', 'كلمة المرور', 'placeholder');
+            e('li_remember', 'Remember me', 'تذكرني');
+            e('li_forgot', 'Forgot password?', 'هل نسيت كلمة المرور؟');
+            e('li_btn', 'Log in', 'تسجيل الدخول');
+            e('txt_or', 'or', 'أو');
+            if(document.getElementById('li_switch_text')) document.getElementById('li_switch_text').innerHTML = isArabic ? `ليس لديك حساب؟ <button type="button" class="font-bold hover:underline" style="color: var(--color-primary, #dc2626);" onclick="window.navigateToAuth('signup')">إنشاء حساب</button>` : `Don't have an account? <button type="button" class="font-bold hover:underline" style="color: var(--color-primary, #dc2626);" onclick="window.navigateToAuth('signup')">Sign up</button>`;
+            
+            e('su_heading', 'Create account', 'إنشاء حساب جديد');
+            e('su_sub', 'Sign up to get started — it only takes a minute.', 'قم بالتسجيل للبدء — لن يستغرق الأمر سوى دقيقة.');
+            e('su_lbl_user', 'Username', 'اسم المستخدم');
+            e('regUsername', 'choose a username', 'اختر اسم مستخدم', 'placeholder');
+            e('su_lbl_phone', 'Phone number', 'رقم الهاتف');
+            e('regPhone', '+964 750 123 4567', '+964 750 123 4567', 'placeholder');
+            e('su_lbl_pass', 'Password', 'كلمة المرور');
+            e('regPassword', 'create a password', 'إنشاء كلمة مرور', 'placeholder');
+            e('su_btn', 'Create account', 'إنشاء الحساب');
+            e('txt_or_2', 'or', 'أو');
+            if(document.getElementById('su_switch_text')) document.getElementById('su_switch_text').innerHTML = isArabic ? `لديك حساب بالفعل؟ <button type="button" class="font-bold hover:underline" style="color: var(--color-primary, #dc2626);" onclick="window.navigateToAuth('signup')">تسجيل الدخول</button>` : `Already have an account? <button type="button" class="font-bold hover:underline" style="color: var(--color-primary, #dc2626);" onclick="window.navigateToAuth('signup')">Log in</button>`;
+            e('su_note', 'By continuing you agree to our Terms of Service and Privacy Policy.', 'بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية الخاصة بنا.');
+            
+document.documentElement.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
             const stgLangBtn = document.getElementById('stg_lang_btn');
             if (stgLangBtn) stgLangBtn.textContent = isArabic ? 'English' : 'العربية';
             
@@ -1999,7 +2495,7 @@ const dict = {
                     supaClient.from('products').select('*'),
                     supaClient.from('categories').select('*'),
                     supaClient.from('banners').select('*'),
-                    supaClient.from('orders').select('*')
+                    currentUser ? supaClient.from('orders').select('*').eq('user_id', currentUser.id) : Promise.resolve({ data: [] })
                 ]);
                 let rRes = { data: [] };
                 let commRes = { data: [] };
@@ -2074,7 +2570,7 @@ const dict = {
             const customer = { name, phone, city, loc, promo: window.activePromo };
             const items = cart.map(c => ({ id: c.id, title: c.title, price: c.price, qty: c.qty }));
             
-            const { data, error } = await supaClient.from('orders').insert([{ customer, items, total_amount: total }]).select();
+            const { data, error } = await supaClient.from('orders').insert([{ customer, items, total_amount: total, user_id: currentUser.id }]).select();
             
             btn.disabled = false;
             btn.innerHTML = isArabic ? dict.ar.coSubmit : dict.en.coSubmit;
@@ -2131,7 +2627,7 @@ const dict = {
         const renderMyOrdersList = () => {
             const container = document.getElementById('myOrdersList');
             if(!container) return;
-            const myOrders = ordersData.filter(o => myOrderIds.includes(o.id));
+            const myOrders = ordersData || []; // Orders are strictly tied to the logged-in user via server auth
             
             if(myOrders.length === 0) {
                 container.innerHTML = `<div class="text-center text-gray-600 py-10">${isArabic ? 'لا توجد طلبات' : 'No orders found'}</div>`;
@@ -2212,6 +2708,11 @@ const dict = {
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
+            if(typeof window.handleRouting === 'function') window.handleRouting();
+            const { data: { session } } = await supaClient.auth.getSession();
+            currentUser = session ? session.user : null;
+            if(typeof updateAuthUI === 'function') updateAuthUI(); checkBans();
+            
             updateFavoritesUI();
             applyDarkMode();
             applyLanguage();
@@ -2257,7 +2758,7 @@ const dict = {
             slider.scrollBy({ left: dir * width, behavior: 'smooth' });
         };
         
-        document.addEventListener('DOMContentLoaded', () => {
+        (() => {
             const pmSlider = document.getElementById('pm_slider');
             if (pmSlider) {
                 pmSlider.addEventListener('scroll', () => {
@@ -2623,10 +3124,190 @@ const dict = {
             <button onclick="document.getElementById('ratingModal').classList.replace('flex','hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="ph-bold ph-x text-lg"></i></button>
             <h3 class="text-xl font-black text-gray-900 mb-1 text-center" id="rm_title">Rate Product</h3>
             <p class="text-sm text-gray-500 mb-6 text-center" id="rm_desc">Tap a star to select.</p>
-            <div class="flex items-center justify-center gap-2 mb-6" id="ratingModalStars"></div>
+            <div class="flex items-center justify-center gap-2 mb-2" id="ratingModalStars"></div>
+            <div class="text-center mb-4 min-h-[28px] flex items-center justify-center">
+                <span id="rm_numeric_display" class="font-bold text-gray-800 text-lg transition-opacity duration-200" style="opacity: 0;"></span>
+            </div>
             <button onclick="submitRating()" class="hidden w-full bg-green-500 hover:bg-green-600 text-black font-black py-3 rounded-xl transition-colors shadow-lg shadow-green-500/30" id="rm_submit_btn">Apply Rating</button>
         </div>
     </div>
 <div class="hidden bg-yellow-500 hover:bg-yellow-600 text-white shadow-md shadow-yellow-500/20"></div>
+
+    
+
+    
+
+
+
+
+<div class="page" id="authOverlay" style="display:none; position:fixed; inset:0; z-index:99999; background:var(--bg);">
+
+      <aside class="brand">
+        <div class="logo">
+          <img class="mark" src="https://raw.githubusercontent.com/IQ-Mart/IQ-Mart/refs/heads/main/iqmart-logo-light-modified-512.png" alt="IQ Mart logo" />
+          <span>IQ Mart</span>
+        </div>
+        <div class="brand-hero">
+          <h1>Welcome back to your workspace.</h1>
+          <p>Manage your account, keep your details safe, and pick up right where you left off.</p>
+        </div>
+        <div class="brand-foot">© 2026 IQ Mart. All rights reserved.</div>
+      </aside>
+
+      <main class="panel">
+        <button onclick="document.getElementById('authOverlay').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:var(--ink-soft);">&times;</button>
+        <div class="card">
+          <div class="tabs" role="tablist">
+            <div class="tab active" data-tab="login">Log in</div>
+            <div class="tab" data-tab="signup">Sign up</div>
+          </div>
+
+          <!-- Log in -->
+          <form class="form active" id="login-form" autocomplete="on" >
+            <h2 class="heading">Log in</h2>
+            <p class="sub">Enter your details to access your account.</p>
+
+            <div class="field">
+              <label for="login-id">Username or phone number</label>
+              <div class="input-wrap">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </span>
+                <input type="text" id="login-id" name="login-id" placeholder="username or phone" autocomplete="username" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="login-password">Password</label>
+              <div class="input-wrap">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <input type="password" id="login-password" name="login-password" placeholder="password" autocomplete="current-password" required />
+                <button type="button" class="toggle-eye" data-target="login-password" aria-label="Show password">
+                  <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a13.8 13.8 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3.5 7 10 7a9.1 9.1 0 0 0 5.39-1.61"/><path d="M2 2l20 20"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <label class="remember"><input type="checkbox" checked /> Remember me</label>
+              <a href="#" class="link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="submit">Log in</button>
+
+            <div class="divider">or</div>
+
+            <p class="switch-text">Don't have an account? <button type="button" data-switch="signup">Sign up</button></p>
+          </form>
+
+          <!-- Sign up -->
+          <form class="form" id="signup-form" autocomplete="on" >
+            <h2 class="heading">Create account</h2>
+            <p class="sub">Sign up to get started — it only takes a minute.</p>
+
+            <div class="field">
+              <label for="su-username">Username</label>
+              <div class="input-wrap">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </span>
+                <input type="text" id="su-username" name="su-username" placeholder="choose a username" autocomplete="username" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="su-phone">Phone number</label>
+              <div class="input-wrap">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </span>
+                <input type="tel" id="su-phone" name="su-phone" placeholder="+1 555 123 4567" autocomplete="tel" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="su-password">Password</label>
+              <div class="input-wrap">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <input type="password" id="su-password" name="su-password" placeholder="create a password" autocomplete="new-password" required />
+                <button type="button" class="toggle-eye" data-target="su-password" aria-label="Show password">
+                  <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7ez"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a13.8 13.8 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3.5 7 10 7a9.1 9.1 0 0 0 5.39-1.61"/><path d="M2 2l20 20"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="submit">Create account</button>
+
+            <div class="divider">or</div>
+
+            <p class="switch-text">Already have an account? <button type="button" data-switch="login">Log in</button></p>
+          </form>
+
+          <p class="note">By continuing you agree to our Terms of Service and Privacy Policy.</p>
+        </div>
+      </main>
+    </div>
+
+    
+
+
+
+    
+
+
+>>
+
+
+
+
+
+    <!-- Comments Modal -->
+    <div id="commentsModal" class="fixed inset-0 bg-black/50 z-[100] hidden opacity-0 transition-opacity duration-300 flex justify-center items-end md:items-center" onclick="if(event.target === this) closeCommentsModal()">
+        <div id="commentsModalContent" class="bg-white w-full h-full rounded-none flex flex-col transform translate-y-full transition-transform duration-300 relative shadow-2xl">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white z-10 shrink-0">
+                <h3 class="font-black text-xl text-gray-900" id="cm_title">Comments</h3>
+                <button onclick="closeCommentsModal()" class="p-2 bg-gray-50 hover:bg-gray-100 rounded-full text-gray-800 transition-colors">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            
+            <div id="cm_list" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-gray-50">
+                <!-- Comments will be rendered here -->
+            </div>
+            
+            <div class="p-4 border-t border-gray-100 bg-white shrink-0">
+                <div id="cm_input_area" class="flex gap-2 items-end">
+                    <textarea id="cm_text" rows="1" placeholder="Write a comment..." class="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 resize-none max-h-32 min-h-[46px]"></textarea>
+                    <button id="cm_submit" class="w-12 h-12 shrink-0 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl flex items-center justify-center transition-colors shadow-md">
+                        <i class="ph-bold ph-paper-plane-right text-lg"></i>
+                    </button>
+                </div>
+                <p id="cm_login_req" class="text-sm text-red-500 mt-2 hidden text-center font-medium">You must be logged in to comment.</p>
+            </div>
+        </div>
+    </div>
+
+<!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-xl transform -translate-y-20 opacity-0 transition-all duration-300 z-[9999] flex items-center gap-3 text-sm font-medium pointer-events-none">
+        <i class="ph-fill ph-check-circle text-green-400 text-xl"></i>
+        <span id="toastMsg">Success</span>
+    </div>
+
 </body>
-</html>
+</html><script id="account-router">
+    window.navigateToAuth = () => {
+        window.location.href = 'account/';
+    };
+    window.handleLogout = async () => {
+        if(typeof supaClient !== 'undefined') {
+            await supaClient.auth.signOut();
+            window.location.reload();
+        }
+    };
+</script>
