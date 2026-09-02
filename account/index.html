@@ -843,7 +843,7 @@
                     banScreen.innerHTML = `
                         <h1 style="color: white; font-size: 24px; margin-bottom: 10px; font-family: inherit;">${window.isArabic ? 'تم حظر حسابك' : 'Your account is banned'}</h1>
                         <p style="color: #9ca3af; margin-bottom: 24px; font-family: inherit;">${window.isArabic ? 'نعتذر، ولكن تم حظر هذا الحساب.' : 'Sorry, this account has been banned.'}</p>
-                        <button onclick="(async () => { await supaClient.auth.signOut(); window.location.href = '/'; })()" style="background: #dc2626; color: white; padding: 12px 24px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; font-family: inherit;">${window.isArabic ? 'تسجيل الخروج' : 'Log Out'}</button>
+                        <button onclick="(async () => { await supaClient.auth.signOut(); window.location.href = '/IQ-Mart/'; })()" style="background: #dc2626; color: white; padding: 12px 24px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; font-family: inherit;">${window.isArabic ? 'تسجيل الخروج' : 'Log Out'}</button>
                     `;
                     document.body.appendChild(banScreen);
                 }
